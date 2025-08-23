@@ -1,7 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 
-from app.schemas import Author, User, Book, Review, OrderItem, Order
+from app.database.models import Author, User, Book, Review, OrderItem, Order
 
 if __name__ == "__main__":
     # Create an author instance
@@ -9,7 +9,7 @@ if __name__ == "__main__":
         id=1,
         first_name="J.R.R.",
         last_name="Tolkien",
-        biography="A fantasy author best known for The Lord of the Rings."
+        biography="A fantasy author best known for The Lord of the Rings.",
     )
     print(f"Created Author: {jrr_tolkien.last_name}")
 
@@ -20,7 +20,7 @@ if __name__ == "__main__":
         last_name="Doe",
         email="john.doe@example.com",
         password_hash="hashed_password_string",
-        created_at=datetime.now()
+        created_at=datetime.now(),
     )
     print(f"Created User: {john_doe.email}")
 
@@ -33,7 +33,7 @@ if __name__ == "__main__":
         price=Decimal("15.99"),
         published_date=datetime(1937, 9, 21),
         description="A fantasy novel by J.R.R. Tolkien.",
-        stock_quantity=50
+        stock_quantity=50,
     )
     print(f"Created Book: {the_hobbit.title} by {the_hobbit.author_id}")
 
@@ -44,7 +44,7 @@ if __name__ == "__main__":
         user_id=john_doe.id,
         rating=5,
         comment="An absolute classic!",
-        created_at=datetime.now()
+        created_at=datetime.now(),
     )
     print(f"Created Review with rating: {review_one.rating}")
 
@@ -54,7 +54,7 @@ if __name__ == "__main__":
         order_id=4001,
         book_id=the_hobbit.id,
         quantity=1,
-        price_at_purchase=the_hobbit.price
+        price_at_purchase=the_hobbit.price,
     )
 
     customer_order = Order(
@@ -63,10 +63,12 @@ if __name__ == "__main__":
         order_date=datetime.now(),
         total_price=order_item_1.price_at_purchase * order_item_1.quantity,
         status="Shipped",
-        items=[order_item_1]
+        items=[order_item_1],
     )
 
-    print(f"Created Order for user ID {customer_order.user_id} with a total price of ${customer_order.total_price}")
+    print(
+        f"Created Order for user ID {customer_order.user_id} with a total price of ${customer_order.total_price}"
+    )
 
     # Pydantic validation handles bad data automatically.
     # try:

@@ -1,27 +1,26 @@
 from datetime import datetime
-from typing import List, Optional
-from pydantic import BaseModel, Field
-
-# Using a custom type for decimal to ensure precision
 from decimal import Decimal
+from typing import Optional, List
+
+from sqlmodel import SQLModel, Field
 
 
-# --- Core Models ---
-
-class Author(BaseModel):
+class Author(SQLModel, table=True):
     """
     Represents an author of books.
     """
-    id: int
+
+    id: int = Field(primary_key=True, index=True)
     first_name: str
     last_name: str
     biography: Optional[str] = None
 
 
-class User(BaseModel):
+class User(SQLModel, table=True):
     """
     Represents a customer or user of the bookstore.
     """
+
     id: int
     first_name: str
     last_name: str
@@ -30,10 +29,11 @@ class User(BaseModel):
     created_at: datetime
 
 
-class Book(BaseModel):
+class Book(SQLModel, table=True):
     """
     Represents an individual book product.
     """
+
     id: int
     title: str
     author_id: int
@@ -45,22 +45,25 @@ class Book(BaseModel):
     cover_image_url: Optional[str] = None
 
 
-class Review(BaseModel):
+class Review(SQLModel, table=True):
     """
     Represents a review for a specific book.
     """
+
     id: int
     book_id: int
     user_id: int
-    rating: int = Field(..., ge=1, le=5)  # Rating must be between 1 and 5
+    # Rating to be expressed in stars, must be between 1 and 5
+    rating: int = Field(..., ge=1, le=5)
     comment: Optional[str] = None
     created_at: datetime
 
 
-class OrderItem(BaseModel):
+class OrderItem(SQLModel):
     """
     Represents an individual book within an order. This is a junction model.
     """
+
     id: int
     order_id: int
     book_id: int
@@ -68,10 +71,11 @@ class OrderItem(BaseModel):
     price_at_purchase: Decimal
 
 
-class Order(BaseModel):
+class Order(SQLModel, table=True):
     """
     Represents a customer's purchase.
     """
+
     id: int
     user_id: int
     order_date: datetime
