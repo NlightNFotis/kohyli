@@ -28,3 +28,10 @@ GET http://127.0.0.1:8000/authors
 HTTP 200
 [Asserts]
 jsonpath "$" count == 2
+
+# And let's try to find an individual author by id
+GET http://127.0.0.1:8000/authors/1
+HTTP 200
+[Asserts]
+jsonpath "$.first_name" == "J.R.R."
+jsonpath "$.last_name" == "Tolkien"

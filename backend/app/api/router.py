@@ -40,3 +40,12 @@ async def get_all_authors(session: SessionDep) -> List[Author]:
     result = await session.execute(select(Author))
     authors: List[Author] = result.scalars().all()
     return [a.model_dump() for a in authors]
+
+
+@router.get("/authors/{id}")
+async def get_author(id: int, session: SessionDep) -> Author:
+    """Retrieve a specific author, by id, from the database."""
+    author = await session.get(Author, id)
+    if not author:
+        raise HTTPException(status_code=404, detail="Author not found.")
+    return author.model_dump()
