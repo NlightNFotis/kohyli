@@ -12,7 +12,7 @@ def root():
     return {"message": "Welcome to Vivliopoleio Kohyli."}
 
 
-@router.get("/book")
+@router.get("/books/{id}")
 async def get_book(id: int, session: SessionDep) -> Book:
     """Retrieve all the products in the in-memory database."""
     book = await session.get(Book, id)
