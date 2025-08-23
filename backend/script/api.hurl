@@ -22,3 +22,9 @@ GET http://127.0.0.1:8000/books
 HTTP 200
 [Asserts]
 jsonpath "$" count == 2
+
+# Let's now get a list of all the authors available in our store
+GET http://127.0.0.1:8000/authors
+HTTP 200
+[Asserts]
+jsonpath "$" count == 2
