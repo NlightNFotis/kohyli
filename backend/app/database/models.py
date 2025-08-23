@@ -84,6 +84,5 @@ class Order(SQLModel, table=True):
     total_price: Decimal
     status: str
     items: List[OrderItem] = Relationship(
-        back_populates="order",
-        sa_relationship_kwargs={"cascade": "all, delete"}
+        back_populates="order", sa_relationship_kwargs={"cascade": "all, delete"}
     )

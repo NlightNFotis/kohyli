@@ -1,3 +1,6 @@
+from typing import Annotated
+
+from fastapi import Depends
 from sqlalchemy import create_engine
 from sqlmodel import SQLModel, Session
 
@@ -21,3 +24,7 @@ def get_session():
     with Session(engine) as session:
         yield session
 
+
+# Type hinting for the session dependency, which FastAPI
+# can leverage to inject the session object into the endpoint.
+SessionDep = Annotated[Session, Depends(get_session)]

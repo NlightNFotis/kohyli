@@ -1,11 +1,9 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-from fastapi.params import Depends
-from sqlmodel import Session
 
 from app.database.models import Book
-from app.database.session import create_tables, get_session
+from app.database.session import create_tables, get_session, SessionDep
 
 
 @asynccontextmanager
@@ -34,7 +32,7 @@ def root():
 
 
 @app.get("/book")
-def get_book(id: int, session: Session = Depends(get_session)):
+def get_book(id: int, session: SessionDep):
     """Retrieve all the products in the in-memory database."""
     book = session.get(Book, id)
 
