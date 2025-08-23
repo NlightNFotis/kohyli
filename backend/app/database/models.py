@@ -59,7 +59,7 @@ class Review(SQLModel, table=True):
     created_at: datetime
 
 
-class OrderItem(SQLModel):
+class OrderItem(SQLModel, table=True):
     """
     Represents an individual book within an order. This is a junction model.
     """

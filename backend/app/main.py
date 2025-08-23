@@ -1,8 +1,11 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.params import Depends
+from sqlmodel import Session
 
-from app.database.session import create_tables
+from app.database.models import Book
+from app.database.session import create_tables, get_session
 
 
 @asynccontextmanager
@@ -30,11 +33,12 @@ def root():
     return {"message": "Welcome to Vivliopoleio Kohyli."}
 
 
-# Very simple in-memory database for now
-products = []
-
-
-@app.get("/books")
-def get_all_products():
+@app.get("/book")
+def get_book(id: int, session: Session = Depends(get_session)):
     """Retrieve all the products in the in-memory database."""
-    return products
+    book = session.get(Book, id)
+
+    if not book:
+        return {"message": "Book not found."}
+
+    return book.model_dump()

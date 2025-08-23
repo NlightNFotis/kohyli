@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine
-from sqlmodel import SQLModel
+from sqlmodel import SQLModel, Session
 
 engine = create_engine(
     url="sqlite:///./kohyli.db",
@@ -15,3 +15,9 @@ def create_tables():
     from .models import Book, User, Author, Review, Order, OrderItem
 
     SQLModel.metadata.create_all(engine)
+
+
+def get_session():
+    with Session(engine) as session:
+        yield session
+
