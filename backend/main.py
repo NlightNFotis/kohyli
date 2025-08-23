@@ -1,10 +1,8 @@
-from typing import Union
-
 from fastapi import FastAPI
 
 app = FastAPI(
-    title="Kohyli Artisan Goods E-Shop API",
-    description="A simple API for a local artisan goods store from Crete.",
+    title="Kohyli Bookstore",
+    description="A simple API for a bookstore.",
     version="0.1.0",
 )
 
@@ -12,14 +10,14 @@ app = FastAPI(
 @app.get("/")
 def root():
     """A simple welcome message (and online status)."""
-    return {"message": "Welcome to Kohyli Artisan Goods E-Shop API."}
+    return {"message": "Welcome to Vivliopoleio Kohyli.."}
 
 
 # Very simple in-memory database for now
 products = []
 
 
-@app.get("/products")
+@app.get("/books")
 def get_all_products():
     """Retrieve all the products in the in-memory database."""
     return products
