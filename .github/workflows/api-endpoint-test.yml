@@ -41,7 +41,7 @@ jobs:
             VERSION: '7.0.0'
         
         - name: Run Hurl tests
-          run: hurl --test scripts/api.hurl
+          run: hurl --test script/api.hurl
         
         - name: Show server log (on failure or success)
           if: always()
