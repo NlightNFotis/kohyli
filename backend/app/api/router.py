@@ -49,3 +49,17 @@ async def get_author(id: int, session: SessionDep) -> Author:
     if not author:
         raise HTTPException(status_code=404, detail="Author not found.")
     return author.model_dump()
+
+
+@router.get("/authors/{id}/books")
+async def get_author_books(id: int, session: SessionDep) -> List[Book]:
+    """Retrieve all books by an author, by id, from the database."""
+    author = await session.get(Author, id)
+    if not author:
+        raise HTTPException(status_code=404, detail="Author not found.")
+
+    stmt = select(Book).where(Book.author_id == id)
+    result = await session.execute(stmt)
+
+    books = result.scalars().all()
+    return [b.model_dump() for b in books]

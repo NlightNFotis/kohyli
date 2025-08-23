@@ -35,3 +35,16 @@ HTTP 200
 [Asserts]
 jsonpath "$.first_name" == "J.R.R."
 jsonpath "$.last_name" == "Tolkien"
+
+# And let's try to find an author that doesn't exist
+GET http://127.0.0.1:8000/authors/9999
+HTTP 404
+[Asserts]
+jsonpath "$.detail" == "Author not found."
+
+# Now let's retrieve a book by a known author
+GET http://127.0.0.1:8000/authors/1/books
+HTTP 200
+[Asserts]
+jsonpath "$" count == 1
+jsonpath "$.[0].title" == "The Hobbit"
