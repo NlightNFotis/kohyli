@@ -11,6 +11,11 @@ on:
 jobs:
     test-api-endpoints:
       runs-on: ubuntu-latest
+      defaults:
+        run:
+          shell: bash
+          working-directory: ./backend/
+
       steps:
         - name: Checkout repository
           uses: actions/checkout@v3
