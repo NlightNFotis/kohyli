@@ -1,3 +1,6 @@
 # Run kohyli backend in dev mode (hot-reload)
 run-dev:
     uv run fastapi dev
+
+format:
+    uv format --preview-features format
