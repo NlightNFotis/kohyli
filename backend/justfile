@@ -4,3 +4,7 @@ run-dev:
 
 format:
     uv format --preview-features format
+
+# Run hurl-based API endpoint testing
+test-api:
+    hurl script/api.hurl
