@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 
 from app.database.models import Book
 from app.database.session import create_tables, get_session, SessionDep
@@ -32,11 +32,11 @@ def root():
 
 
 @app.get("/book")
-def get_book(id: int, session: SessionDep):
+def get_book(id: int, session: SessionDep) -> Book:
     """Retrieve all the products in the in-memory database."""
     book = session.get(Book, id)
 
     if not book:
-        return {"message": "Book not found."}
+        raise HTTPException(status_code=404, detail="Book not found.")
 
     return book.model_dump()
