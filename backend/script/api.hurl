@@ -16,3 +16,9 @@ GET http://127.0.0.1:8000/books/9999
 HTTP 404
 [Asserts]
 jsonpath "$.detail" == "Book not found."
+
+# Cool, let's get a list of all books (2 expected currently).
+GET http://127.0.0.1:8000/books
+HTTP 200
+[Asserts]
+jsonpath "$" count == 2

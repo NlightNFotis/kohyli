@@ -1,4 +1,7 @@
+from typing import List
+
 from fastapi import APIRouter, HTTPException
+from sqlmodel import select
 
 from app.database.models import Book
 from app.database.session import SessionDep
@@ -12,9 +15,17 @@ def root():
     return {"message": "Welcome to Vivliopoleio Kohyli."}
 
 
+@router.get("/books")
+async def get_all_books(session: SessionDep) -> List[Book]:
+    """Retrieve all books available in our store."""
+    result = await session.execute(select(Book))
+    books: List[Book] = result.scalars().all()
+    return [b.model_dump() for b in books]
+
+
 @router.get("/books/{id}")
 async def get_book(id: int, session: SessionDep) -> Book:
-    """Retrieve all the products in the in-memory database."""
+    """Retrieve a specific book, by id, from the database."""
     book = await session.get(Book, id)
 
     if not book:
