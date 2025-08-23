@@ -1,6 +1,9 @@
-def main():
-    print("Hello from backend!")
+from typing import Union
 
+from fastapi import FastAPI
 
-if __name__ == "__main__":
-    main()
+app = FastAPI()
+
+@app.get("/")
+def read_root():
+    return {"Hello": "World"}
