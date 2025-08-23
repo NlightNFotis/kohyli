@@ -9,7 +9,7 @@ from app.database.session import create_tables, get_session, SessionDep
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Anything that happens before the yield happens before the app starts
-    create_tables()
+    await create_tables()
 
     yield
 
@@ -32,9 +32,9 @@ def root():
 
 
 @app.get("/book")
-def get_book(id: int, session: SessionDep) -> Book:
+async def get_book(id: int, session: SessionDep) -> Book:
     """Retrieve all the products in the in-memory database."""
-    book = session.get(Book, id)
+    book = await session.get(Book, id)
 
     if not book:
         raise HTTPException(status_code=404, detail="Book not found.")
