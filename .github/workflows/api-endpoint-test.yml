@@ -29,7 +29,7 @@ jobs:
         - name: Start the API server (background)
           run: |
             # Start server and capture logs
-            uv run fastapi dev 2>&1
+            uv run fastapi dev 2>&1 &
             echo $! > server.pid.txt
             echo "Server started with PID $(cat server.pid.txt)"
 
