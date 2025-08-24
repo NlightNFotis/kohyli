@@ -2,11 +2,13 @@ from typing import List
 
 from sqlmodel import select
 
-from app.database.models import Book, Order
+from app.database.models import Order, OrderItem
 from app.database.session import SessionDep
 
-# OrdersService: encapsulate DB operations for orders to be reused by routes
+
 class OrdersService:
+    """Encapsulate DB operations and other logic for orders."""
+
     def __init__(self, session: SessionDep):
         self._session = session
 
@@ -31,11 +33,20 @@ class OrdersService:
         await self._session.refresh(order)
         return order
 
-    async def get_items(self, order_id: int) -> List[Book] | None:
+    async def get_items(self, order_id: int) -> List[OrderItem] | None:
+        """
+        Return list of specific order items for the given order_id.
+        Avoids lazy-loading the relationship on the order instance,
+        by querying the OrderItem table directly in the async context.
+        """
         order = await self.get_by_id(order_id)
         if not order:
             return None
-        return order.items
+
+        stmt = select(OrderItem).where(OrderItem.order_id == order_id)
+        result = await self._session.execute(stmt)
+        items = result.scalars().all()
+        return items
 
     async def create(self, user_id: int, *args, **kwargs) -> Order:
         """Create a new order. Implementation detail depends on incoming payload shape.
