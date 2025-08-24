@@ -10,3 +10,8 @@ dependencies = [
     "greenlet>=3.2.4",
     "sqlmodel>=0.0.24",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.1",
+]
