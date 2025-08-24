@@ -5,6 +5,7 @@ from sqlmodel import select
 
 from app.database.models import Book, Author, User, Order
 from app.database.session import SessionDep
+from app.services.authors import AuthorsServiceDep
 from app.services.orders import OrdersServiceDep
 
 router = APIRouter()
@@ -35,17 +36,16 @@ async def get_book(id: int, session: SessionDep) -> Book:
 
 
 @router.get("/authors")
-async def get_all_authors(session: SessionDep) -> List[Author]:
+async def get_all_authors(authors_service: AuthorsServiceDep) -> List[Author]:
     """Retrieve all the authors available in our store."""
-    result = await session.execute(select(Author))
-    authors: List[Author] = result.scalars().all()
+    authors: List[Author] = await authors_service.get_all()
     return [a.model_dump() for a in authors]
 
 
 @router.get("/authors/{id}")
-async def get_author(id: int, session: SessionDep) -> Author:
+async def get_author(id: int, authors_service: AuthorsServiceDep) -> Author:
     """Retrieve a specific author, by id, from the database."""
-    author = await session.get(Author, id)
+    author = await authors_service.get_by_id(id)
     if not author:
         raise HTTPException(status_code=404, detail="Author not found.")
 
@@ -53,16 +53,9 @@ async def get_author(id: int, session: SessionDep) -> Author:
 
 
 @router.get("/authors/{id}/books")
-async def get_author_books(id: int, session: SessionDep) -> List[Book]:
+async def get_author_books(author_id: int, authors_service: AuthorsServiceDep) -> List[Book]:
     """Retrieve all books by an author, by id, from the database."""
-    author = await session.get(Author, id)
-    if not author:
-        raise HTTPException(status_code=404, detail="Author not found.")
-
-    stmt = select(Book).where(Book.author_id == id)
-    result = await session.execute(stmt)
-
-    books = result.scalars().all()
+    books = await authors_service.get_books_for_author(author_id)
     return [b.model_dump() for b in books]
 
 
