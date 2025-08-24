@@ -5,6 +5,7 @@ from sqlmodel import select
 
 from app.database.models import Book, Author, User, Order
 from app.database.session import SessionDep
+from app.services.orders import OrdersServiceDep
 
 router = APIRouter()
 
@@ -107,10 +108,9 @@ async def get_user_orders(id: int, session: SessionDep) -> List[Order]:
 
 
 @router.get("/orders")
-async def get_all_orders(session: SessionDep) -> List[Order]:
+async def get_all_orders(orders_service: OrdersServiceDep) -> List[Order]:
     """Retrieve all orders from the database."""
-    result = await session.execute(select(Order))
-    orders: List[Order] = result.scalars().all()
+    orders = await orders_service.get_all()
     return [o.model_dump() for o in orders]
 
 
@@ -118,42 +118,37 @@ async def get_all_orders(session: SessionDep) -> List[Order]:
 # how to pass them in from the frontend. Probably needs to take it
 # in the request body, but we may need a new Pydantic model for that.
 @router.post("/orders/{user_id}")
-async def create_order(user_id: int, session: SessionDep) -> Order:
+async def create_order(user_id: int, orders_service: OrdersServiceDep) -> Order:
     """Create a new order for a specific user."""
     raise NotImplementedError
 
-    order = Order(user_id=user_id)
-    session.add(order)
-    await session.commit()
-    await session.refresh(order)
-    return order.model_dump()
-
+    orders_service.create(user_id)
+    # TODO
 
 @router.get("/orders/{id}")
-async def get_order(id: int, session: SessionDep) -> Order:
+async def get_order(id: int, orders_service: OrdersServiceDep) -> Order:
     """Retrieve a specific order by id."""
-    order = await session.get(Order, id)
+    order = await orders_service.get(Order, id)
     if not order:
         raise HTTPException(status_code=404, detail="Order not found.")
     return order.model_dump()
 
 
 @router.patch("/orders/{id}/cancel")
-async def cancel_order(id: int, session: SessionDep) -> Order:
+async def cancel_order(id: int, orders_service: OrdersServiceDep) -> Order:
     """Cancel an order by id."""
-    order = await session.get(Order, id)
+    order = await orders_service.cancel(id)
     if not order:
         raise HTTPException(status_code=404, detail="Order not found.")
-    order.status = "Cancelled"
-    await session.commit()
-    await session.refresh(order)
+    return order.model_dump()
 
 
 @router.get("/orders/{id}/items")
-async def get_order_items(id: int, session: SessionDep) -> List[Book]:
+async def get_order_items(id: int, orders_service: OrdersServiceDep) -> List[Book]:
     """Retrieve all items for a specific order."""
-    order = await session.get(Order, id)
-    if not order:
+    items = await orders_service.get_items(id)
+    if not items:
         raise HTTPException(status_code=404, detail="Order not found.")
-    items = order.items
+
+    # TODO: This is a OrdersItem - should we convert to book
     return [b.model_dump() for b in items]

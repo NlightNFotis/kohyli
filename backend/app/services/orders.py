@@ -1,5 +1,6 @@
-from typing import List
+from typing import List, Annotated
 
+from fastapi import Depends
 from sqlmodel import select
 
 from app.database.models import Order, OrderItem
@@ -52,3 +53,14 @@ class OrdersService:
         """Create a new order. Implementation detail depends on incoming payload shape.
         Left as NotImplemented for now to keep behavior explicit and centralized."""
         raise NotImplementedError
+
+
+async def get_orders_service(session: SessionDep) -> OrdersService:
+    """
+    FastAPI dependency factory that receives an AsyncSession
+    (via SessionDep) and returns an OrdersService instance.
+    """
+    return OrdersService(session)
+
+
+OrdersServiceDep = Annotated[OrdersService, Depends(get_orders_service)]
