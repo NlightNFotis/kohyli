@@ -8,3 +8,7 @@ format:
 # Run hurl-based API endpoint testing
 test-api:
     hurl script/api.hurl
+
+# Run pytest-based unit and integration tests
+test:
+    uv run pytest app/tests
