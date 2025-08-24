@@ -45,13 +45,13 @@ dependencies = [
     { name = "aiosqlite" },
     { name = "fastapi", extra = ["standard"] },
     { name = "greenlet" },
-    { name = "pytest-asyncio" },
     { name = "sqlmodel" },
 ]
 
 [package.dev-dependencies]
 dev = [
     { name = "pytest" },
+    { name = "pytest-asyncio" },
 ]
 
 [package.metadata]
@@ -59,12 +59,14 @@ requires-dist = [
     { name = "aiosqlite", specifier = ">=0.21.0" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.116.1" },
     { name = "greenlet", specifier = ">=3.2.4" },
-    { name = "pytest-asyncio", specifier = ">=1.1.0" },
     { name = "sqlmodel", specifier = ">=0.0.24" },
 ]
 
 [package.metadata.requires-dev]
-dev = [{ name = "pytest", specifier = ">=8.4.1" }]
+dev = [
+    { name = "pytest", specifier = ">=8.4.1" },
+    { name = "pytest-asyncio", specifier = ">=1.1.0" },
+]
 
 [[package]]
 name = "certifi"
