@@ -8,6 +8,7 @@ from app.database.session import SessionDep
 from app.services.authors import AuthorsServiceDep
 from app.services.books import BooksServiceDep
 from app.services.orders import OrdersServiceDep
+from app.services.users import UsersServiceDep
 
 
 router = APIRouter()
@@ -61,43 +62,38 @@ async def get_author_books(author_id: int, authors_service: AuthorsServiceDep) -
 
 
 @router.get("/users")
-async def get_all_users(session: SessionDep) -> List[User]:
+async def get_all_users(users_service: UsersServiceDep) -> List[User]:
     """Retrieve all users from the database."""
-    result = await session.execute(select(User))
-    users: List[User] = result.scalars().all()
+    users = await users_service.get_all()
     return [u.model_dump() for u in users]
 
 
 @router.get("/users/{id}")
-async def get_user(id: int, session: SessionDep) -> User:
+async def get_user(id: int, users_service: UsersServiceDep) -> User:
     """Retrieve a specific user, by id, from the database."""
-    user = await session.get(User, id)
+    user = await users_service.get_by_id(id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found.")
     return user.model_dump()
 
 
 @router.get("/users/email/{email}")
-async def get_user_by_email(email: str, session: SessionDep) -> User:
+async def get_user_by_email(email: str, users_service: UsersServiceDep) -> User:
     """Retrieve a specific user by their email address."""
-    stmt = select(User).where(User.email == email)
-    result = await session.execute(stmt)
-    user = result.scalar_one_or_none()
+    user = await users_service.get_by_email(email)
     if not user:
         raise HTTPException(status_code=404, detail="User not found.")
     return user.model_dump()
 
 
 @router.get("/users/{id}/orders")
-async def get_user_orders(id: int, session: SessionDep) -> List[Order]:
+async def get_user_orders(id: int, users_service: UsersServiceDep) -> List[Order]:
     """Retrieve all orders for a specific user."""
-    user = await session.get(User, id)
+    user = await users_service.get_by_id(id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found.")
 
-    stmt = select(Order).where(Order.user_id == id)
-    result = await session.execute(stmt)
-    orders = result.scalars().all()
+    orders = await users_service.get_orders_for_user(id)
     return [o.model_dump() for o in orders]
 
 
