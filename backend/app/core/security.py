@@ -40,5 +40,6 @@ async def get_user_id(token_data: TokenData, users_service: UsersServiceDep) -> 
         )
     return user
 
+
 # FastAPI dependency for the signed-in user.
 SignedInUserDep = Annotated[User, Depends(get_user_id)]

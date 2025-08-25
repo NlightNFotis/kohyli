@@ -8,7 +8,6 @@ from ..schemas.users import UserCreate, JWTToken
 from app.core.security import TokenDep, SignedInUserDep
 from app.database.models import User, Order
 from app.services.users import UsersServiceDep
-from ...utils import decode_access_token
 
 users_router = APIRouter(prefix="/users")
 
