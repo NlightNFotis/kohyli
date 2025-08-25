@@ -7,6 +7,7 @@ from app.services.orders import OrdersServiceDep
 
 orders_router = APIRouter(prefix="/orders")
 
+
 @orders_router.get("/")
 async def get_all_orders(orders_service: OrdersServiceDep) -> List[Order]:
     """Retrieve all orders from the database."""
@@ -24,6 +25,7 @@ async def create_order(user_id: int, orders_service: OrdersServiceDep) -> Order:
 
     orders_service.create(user_id)
     # TODO
+
 
 @orders_router.get("/{id}")
 async def get_order(id: int, orders_service: OrdersServiceDep) -> Order:

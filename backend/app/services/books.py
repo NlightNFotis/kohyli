@@ -23,7 +23,6 @@ class BooksService:
         """Return a book by id or None if not found."""
         return await self._session.get(Book, book_id)
 
-
     # FOTIS: This is a mirror of books_service.get_books_for_author. We
     # should probably delete one of the two, but let's keep this around
     # for now.

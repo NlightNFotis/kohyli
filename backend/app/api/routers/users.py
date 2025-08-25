@@ -7,6 +7,7 @@ from app.services.users import UsersServiceDep
 
 users_router = APIRouter(prefix="/users")
 
+
 @users_router.get("/")
 async def get_all_users(users_service: UsersServiceDep) -> List[User]:
     """Retrieve all users from the database."""

@@ -47,8 +47,12 @@ async def _seed_authors_and_books(session: AsyncSession):
     """Clear tables then insert a couple of authors and books for testing."""
     await _clear_tables(session)
 
-    a1 = Author(id=1, first_name="J.R.R.", last_name="Tolkien", biography="Fantasy author")
-    a2 = Author(id=2, first_name="George", last_name="Orwell", biography="Dystopian author")
+    a1 = Author(
+        id=1, first_name="J.R.R.", last_name="Tolkien", biography="Fantasy author"
+    )
+    a2 = Author(
+        id=2, first_name="George", last_name="Orwell", biography="Dystopian author"
+    )
 
     b1 = Book(
         id=1001,

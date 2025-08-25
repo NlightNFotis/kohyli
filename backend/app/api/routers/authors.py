@@ -7,6 +7,7 @@ from app.services.authors import AuthorsServiceDep
 
 authors_router = APIRouter(prefix="/authors")
 
+
 @authors_router.get("/")
 async def get_all_authors(authors_service: AuthorsServiceDep) -> List[Author]:
     """Retrieve all the authors available in our store."""
@@ -25,7 +26,9 @@ async def get_author(id: int, authors_service: AuthorsServiceDep) -> Author:
 
 
 @authors_router.get("/{author_id}/books")
-async def get_author_books(author_id: int, authors_service: AuthorsServiceDep) -> List[Book]:
+async def get_author_books(
+    author_id: int, authors_service: AuthorsServiceDep
+) -> List[Book]:
     """Retrieve all books by an author, by id, from the database."""
     books = await authors_service.get_books_for_author(author_id)
     return [b.model_dump() for b in books]
