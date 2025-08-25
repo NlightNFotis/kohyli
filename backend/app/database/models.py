@@ -2,6 +2,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Optional, List
 
+from pydantic import EmailStr
 from sqlmodel import SQLModel, Field, Relationship
 
 
@@ -24,7 +25,7 @@ class User(SQLModel, table=True):
     id: int = Field(primary_key=True, index=True)
     first_name: str
     last_name: str
-    email: str
+    email: EmailStr
     password_hash: str
     created_at: datetime
 

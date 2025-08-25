@@ -1,18 +1,20 @@
 from typing import List
 
 from fastapi import APIRouter, HTTPException
-from sqlmodel import select
 
-from app.database.models import Book, Author, User, Order
-from app.database.session import SessionDep
+from app.database.models import Book, Author,  Order
+
 from app.services.authors import AuthorsServiceDep
 from app.services.books import BooksServiceDep
 from app.services.orders import OrdersServiceDep
-from app.services.users import UsersServiceDep
 
+from .routers.users import user_router
 
 router = APIRouter()
 
+combined_router = APIRouter()
+combined_router.include_router(router)
+combined_router.include_router(user_router)
 
 @router.get("/")
 def root():
@@ -59,42 +61,6 @@ async def get_author_books(author_id: int, authors_service: AuthorsServiceDep) -
     """Retrieve all books by an author, by id, from the database."""
     books = await authors_service.get_books_for_author(author_id)
     return [b.model_dump() for b in books]
-
-
-@router.get("/users")
-async def get_all_users(users_service: UsersServiceDep) -> List[User]:
-    """Retrieve all users from the database."""
-    users = await users_service.get_all()
-    return [u.model_dump() for u in users]
-
-
-@router.get("/users/{id}")
-async def get_user(id: int, users_service: UsersServiceDep) -> User:
-    """Retrieve a specific user, by id, from the database."""
-    user = await users_service.get_by_id(id)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found.")
-    return user.model_dump()
-
-
-@router.get("/users/email/{email}")
-async def get_user_by_email(email: str, users_service: UsersServiceDep) -> User:
-    """Retrieve a specific user by their email address."""
-    user = await users_service.get_by_email(email)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found.")
-    return user.model_dump()
-
-
-@router.get("/users/{id}/orders")
-async def get_user_orders(id: int, users_service: UsersServiceDep) -> List[Order]:
-    """Retrieve all orders for a specific user."""
-    user = await users_service.get_by_id(id)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found.")
-
-    orders = await users_service.get_orders_for_user(id)
-    return [o.model_dump() for o in orders]
 
 
 @router.get("/orders")

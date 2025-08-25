@@ -1,8 +1,8 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 
-from app.api.router import router
+from app.api.router import combined_router
 from app.database.session import create_tables
 
 
@@ -24,4 +24,4 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-app.include_router(router)
+app.include_router(combined_router)
