@@ -11,6 +11,7 @@ from app.config import jwt_settings
 from app.api.schemas.users import UserCreate
 from app.database.models import User, Order
 from app.database.session import SessionDep
+from app.utils import generate_access_token
 
 
 class UsersService:
@@ -42,18 +43,16 @@ class UsersService:
         ):
             return None
 
-        token: str = jwt.encode(
-            payload={
+        token = generate_access_token(
+            data={
                 "user": {
+                    # TODO: FOTIS: VERY UNSAFE! Change this to be encrypted or something
+                    "user_id": user.id,
                     "email": user.email,
                     "first_name": user.first_name,
                     "last_name": user.last_name,
-                },
-                "exp": datetime.now()
-                + timedelta(minutes=jwt_settings.access_token_expire_minutes),
-            },
-            algorithm=jwt_settings.JWT_ALGORITHM,
-            key=jwt_settings.JWT_SECRET,
+                }
+            }
         )
 
         return token

@@ -9,7 +9,9 @@ class UserCreate(BaseModel):
     email: EmailStr
     password: str
 
+
 class JWTToken(BaseModel):
     """Model for JWT tokens returned by the API after login workflow."""
+
     access_token: str
     type: str

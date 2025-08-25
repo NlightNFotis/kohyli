@@ -5,8 +5,10 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from ..schemas.users import UserCreate, JWTToken
 
+from app.core.security import TokenDep
 from app.database.models import User, Order
 from app.services.users import UsersServiceDep
+from ...utils import decode_access_token
 
 users_router = APIRouter(prefix="/users")
 
@@ -56,11 +58,19 @@ async def get_user_by_email(email: str, users_service: UsersServiceDep) -> User:
     return user
 
 
-@users_router.get("/{id}/orders")
-async def get_user_orders(id: int, users_service: UsersServiceDep) -> List[Order]:
+@users_router.get("/{user_id}/orders")
+async def get_user_orders(
+    user_id: int, users_service: UsersServiceDep, token: TokenDep
+) -> List[Order]:
     """Retrieve all orders for a specific user."""
-    user = await users_service.get_by_id(id)
+    user = await users_service.get_by_id(user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found.")
+
+    data = decode_access_token(token)
+    if not data:
+        raise HTTPException(status_code=401, detail="Invalid token.")
+
+    id = data.get("user_id")
 
     return await users_service.get_orders_for_user(id)
