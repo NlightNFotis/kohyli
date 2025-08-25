@@ -6,7 +6,9 @@ from sqlmodel import select
 from app.database.models import Book, Author, User, Order
 from app.database.session import SessionDep
 from app.services.authors import AuthorsServiceDep
+from app.services.books import BooksServiceDep
 from app.services.orders import OrdersServiceDep
+
 
 router = APIRouter()
 
@@ -18,17 +20,16 @@ def root():
 
 
 @router.get("/books")
-async def get_all_books(session: SessionDep) -> List[Book]:
+async def get_all_books(books_service: BooksServiceDep) -> List[Book]:
     """Retrieve all books available in our store."""
-    result = await session.execute(select(Book))
-    books: List[Book] = result.scalars().all()
+    books: List[Book] = await books_service.get_all()
     return [b.model_dump() for b in books]
 
 
 @router.get("/books/{id}")
-async def get_book(id: int, session: SessionDep) -> Book:
+async def get_book(id: int, books_service: BooksServiceDep) -> Book:
     """Retrieve a specific book, by id, from the database."""
-    book = await session.get(Book, id)
+    book = await books_service.get_by_id(id)
     if not book:
         raise HTTPException(status_code=404, detail="Book not found.")
 
