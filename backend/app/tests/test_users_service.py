@@ -6,7 +6,9 @@ from decimal import Decimal
 from sqlmodel import SQLModel, text
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import IntegrityError
 
+from app.api.schemas.users import UserCreate
 from app.database.models import User, Order
 from app.services.users import UsersService
 
@@ -52,7 +54,7 @@ async def _seed_users_and_orders(session: AsyncSession):
         last_name="Smith",
         email="alice@example.com",
         password_hash="hash1",
-        created_at=datetime.utcnow(),
+        created_at=datetime.now(),
     )
     u2 = User(
         id=2,
@@ -60,27 +62,27 @@ async def _seed_users_and_orders(session: AsyncSession):
         last_name="Jones",
         email="bob@example.com",
         password_hash="hash2",
-        created_at=datetime.utcnow(),
+        created_at=datetime.now(),
     )
 
     o1 = Order(
         id=2001,
         user_id=1,
-        order_date=datetime.utcnow(),
+        order_date=datetime.now(),
         total_price=Decimal("20.00"),
         status="New",
     )
     o2 = Order(
         id=2002,
         user_id=1,
-        order_date=datetime.utcnow(),
+        order_date=datetime.now(),
         total_price=Decimal("5.00"),
         status="Shipped",
     )
     o3 = Order(
         id=2003,
         user_id=2,
-        order_date=datetime.utcnow(),
+        order_date=datetime.now(),
         total_price=Decimal("12.00"),
         status="New",
     )
@@ -116,6 +118,64 @@ async def test_get_by_id_not_found(session: AsyncSession):
     svc = UsersService(session)
     result = await svc.get_by_id(999999)
     assert result is None
+
+
+@pytest.mark.asyncio
+async def test_create_user_success(session: AsyncSession):
+    # Arrange
+    await _clear_tables(session)
+    svc = UsersService(session)
+    new_user_data = UserCreate(
+        first_name="John",
+        last_name="Doe",
+        email="john@example.com",
+        password="somehash"
+    )
+
+    # Act
+    created_user = await svc.create(new_user_data)
+
+    # Assert
+    assert created_user is not None
+    assert created_user.id is not None
+    assert created_user.first_name == "John"
+    assert created_user.email == "john@example.com"
+    assert created_user.created_at is not None
+
+
+@pytest.mark.asyncio
+async def test_create_user_duplicate_email(session: AsyncSession):
+    # Arrange
+    await _seed_users_and_orders(session)
+    svc = UsersService(session)
+    duplicate_user = UserCreate(
+        first_name="Another",
+        last_name="User",
+        email="alice@example.com",  # Already exists
+        password="hash"
+    )
+
+    # Act & Assert
+    with pytest.raises(IntegrityError):
+        await svc.create(duplicate_user)
+
+
+@pytest.mark.asyncio
+async def test_create_user_invalid_data(session: AsyncSession):
+    # Arrange
+    await _clear_tables(session)
+    svc = UsersService(session)
+
+    # Act & Assert
+    with pytest.raises(ValueError):
+        invalid_user = UserCreate(
+            first_name="",  # Empty first name
+            last_name="Test",
+            email="invalid",  # Invalid email
+            password=""  # Empty password
+        )
+
+        await svc.create(invalid_user)
 
 
 @pytest.mark.asyncio
@@ -157,7 +217,7 @@ async def test_get_orders_for_user_positive_and_degenerate(session: AsyncSession
         last_name="User",
         email="lonely@example.com",
         password_hash="hash",
-        created_at=datetime.utcnow(),
+        created_at=datetime.now(),
     )
     session.add(lonely)
     await session.commit()
@@ -168,3 +228,4 @@ async def test_get_orders_for_user_positive_and_degenerate(session: AsyncSession
     # Non-existent user id: service queries orders table and should return empty list
     orders_none = await svc.get_orders_for_user(999999)
     assert orders_none == []
+

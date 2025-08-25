@@ -25,7 +25,7 @@ class User(SQLModel, table=True):
     id: int = Field(primary_key=True, index=True)
     first_name: str
     last_name: str
-    email: EmailStr
+    email: EmailStr = Field(unique=True)
     password_hash: str
     created_at: datetime
 

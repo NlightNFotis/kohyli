@@ -1,9 +1,12 @@
+from datetime import datetime
 from typing import List, Annotated
 
 from fastapi import Depends
 from sqlmodel import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from passlib.context import CryptContext
 
+from app.api.schemas.users import UserCreate
 from app.database.models import User, Order
 from app.database.session import SessionDep
 
@@ -13,6 +16,19 @@ class UsersService:
 
     def __init__(self, session: AsyncSession):
         self._session = session
+        self._pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+    async def create(self, user_signup: UserCreate) -> User:
+        """Create a new user (part of the signup workflow)."""
+        user = User(**user_signup.model_dump(exclude=["password"]))
+        hashed_password = self._pwd_context.hash(user_signup.password)
+        user.password_hash = hashed_password
+        user.created_at = datetime.now()
+
+        self._session.add(user)
+        await self._session.commit()
+        await self._session.refresh(user)
+        return user
 
     async def get_all(self) -> List[User]:
         """Return all users."""
