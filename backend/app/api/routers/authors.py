@@ -8,7 +8,7 @@ from app.services.authors import AuthorsServiceDep
 authors_router = APIRouter(prefix="/authors")
 
 
-@authors_router.get("/")
+@authors_router.get("")
 async def get_all_authors(authors_service: AuthorsServiceDep) -> List[Author]:
     """Retrieve all the authors available in our store."""
     authors: List[Author] = await authors_service.get_all()

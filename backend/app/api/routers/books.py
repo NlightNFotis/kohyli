@@ -8,7 +8,7 @@ from app.services.books import BooksServiceDep
 books_router = APIRouter(prefix="/books")
 
 
-@books_router.get("/")
+@books_router.get("")
 async def get_all_books(books_service: BooksServiceDep) -> List[Book]:
     """Retrieve all books available in our store."""
     books: List[Book] = await books_service.get_all()

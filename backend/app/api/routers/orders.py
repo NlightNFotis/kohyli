@@ -8,7 +8,7 @@ from app.services.orders import OrdersServiceDep
 orders_router = APIRouter(prefix="/orders")
 
 
-@orders_router.get("/")
+@orders_router.get("")
 async def get_all_orders(orders_service: OrdersServiceDep) -> List[Order]:
     """Retrieve all orders from the database."""
     orders = await orders_service.get_all()
