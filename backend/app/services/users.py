@@ -46,6 +46,8 @@ class UsersService:
             payload={
                 "user": {
                     "email": user.email,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
                 },
                 "exp": datetime.now()
                 + timedelta(minutes=jwt_settings.access_token_expire_minutes),

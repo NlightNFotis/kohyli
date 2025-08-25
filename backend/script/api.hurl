@@ -69,4 +69,4 @@ username: fotis.koutoulakis@gmail.com
 password: fotis is great!
 HTTP 200
 [Asserts]
-bytes count == 170
+bytes count == 233
