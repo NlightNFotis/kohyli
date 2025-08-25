@@ -3,7 +3,7 @@ from typing import List, Annotated
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 
-from ..schemas.users import UserCreate
+from ..schemas.users import UserCreate, JWTToken
 
 from app.database.models import User, Order
 from app.services.users import UsersServiceDep
@@ -27,14 +27,15 @@ async def create_user(user: UserCreate, users_service: UsersServiceDep) -> User:
 async def login_user(
     request_form: Annotated[OAuth2PasswordRequestForm, Depends()],
     users_service: UsersServiceDep,
-) -> str:
+) -> JWTToken:
     """Login a user."""
     email, password = (request_form.username, request_form.password)
 
     token = await users_service.login(email, password)
     if not token:
         raise HTTPException(status_code=401, detail="Email or password incorrect.")
-    return token
+
+    return JWTToken(access_token=token, type="jwt")
 
 
 @users_router.get("/{id}")
