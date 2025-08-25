@@ -13,12 +13,6 @@ from ...utils import decode_access_token
 users_router = APIRouter(prefix="/users")
 
 
-@users_router.get("")
-async def get_all_users(users_service: UsersServiceDep) -> List[User]:
-    """Retrieve all users from the database."""
-    return await users_service.get_all()
-
-
 @users_router.post("/signup")
 async def create_user(user: UserCreate, users_service: UsersServiceDep) -> User:
     """Signup a new user."""
@@ -53,24 +47,6 @@ async def delete_user(users_service: UsersServiceDep, token: TokenDep) -> bool:
         raise HTTPException(status_code=404, detail="User not found.")
 
     return True
-
-
-@users_router.get("/{id}")
-async def get_user(id: int, users_service: UsersServiceDep) -> User:
-    """Retrieve a specific user, by id, from the database."""
-    user = await users_service.get_by_id(id)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found.")
-    return user
-
-
-@users_router.get("/email/{email}")
-async def get_user_by_email(email: str, users_service: UsersServiceDep) -> User:
-    """Retrieve a specific user by their email address."""
-    user = await users_service.get_by_email(email)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found.")
-    return user
 
 
 @users_router.get("/orders")
