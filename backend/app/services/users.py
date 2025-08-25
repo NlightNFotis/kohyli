@@ -29,6 +29,15 @@ class UsersService:
         await self._session.refresh(user)
         return user
 
+    async def login(self, email: str, password: str) -> User | None:
+        """Login a user."""
+        user = await self.get_by_email(email)
+        if not user:
+            return None
+        if not self._pwd_context.verify(password, user.password_hash):
+            return None
+        return user
+
     async def get_all(self) -> List[User]:
         """Return all users."""
         result = await self._session.execute(select(User))
