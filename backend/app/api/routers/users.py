@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from ..schemas.users import UserCreate, JWTToken
 
-from app.core.security import TokenDep
+from app.core.security import TokenDep, SignedInUserDep
 from app.database.models import User, Order
 from app.services.users import UsersServiceDep
 from ...utils import decode_access_token
@@ -35,35 +35,16 @@ async def login_user(
 
 
 @users_router.delete("/delete")
-async def delete_user(users_service: UsersServiceDep, token: TokenDep) -> bool:
-    # Ensure first that our token is valid/not tampered with.
-    data = decode_access_token(token)
-    if not data or not data.get("user_id"):
-        raise HTTPException(status_code=401, detail="Invalid token.")
-
-    # We have a valid token, so we can proceed with trying to delete the user.
-    user = await users_service.delete(data.get("user_id"))
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found.")
-
+async def delete_user(users_service: UsersServiceDep, user: SignedInUserDep) -> bool:
+    # We don't need to perform validation for the user here, as that will
+    # have been done by the dependency.
+    await users_service.delete(user.id)
     return True
 
 
 @users_router.get("/orders")
 async def get_user_orders(
-    users_service: UsersServiceDep, token: TokenDep
+    users_service: UsersServiceDep, user: SignedInUserDep
 ) -> List[Order]:
     """Retrieve all orders for a specific user."""
-
-    # Ensure first that our token is valid/not tampered with.
-    data = decode_access_token(token)
-    if not data or not data.get("user_id"):
-        raise HTTPException(status_code=401, detail="Invalid token.")
-
-    # We have a valid token, so we can proceed by identifying the user.
-    user = await users_service.get_by_id(data.get("user_id"))
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found.")
-
-    # Now that we know that we have a valid user, fetch their orders.
     return await users_service.get_orders_for_user(user.id)
