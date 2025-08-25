@@ -16,7 +16,7 @@ test:
 
 # Generate a new alembic revision
 migration-gen name:
-    uv run alembic revision -m {{name}}
+    uv run alembic revision --autogenerate -m {{name}}
 
 # Get latest alembic revision hash
 migration-current:
