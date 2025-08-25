@@ -27,7 +27,9 @@ async def login_user(
         users_service: UsersServiceDep
 ) -> User:
     """Login a user."""
-    user = await users_service.login(request_form)
+    email, password = (request_form.username, request_form.password)
+
+    user = await users_service.login(email, password)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid credentials.")
     return user

@@ -60,3 +60,11 @@ POST http://127.0.0.1:8000/users/signup
 HTTP 200
 [Asserts]
 jsonpath "$.first_name" == "Fotis"
+
+# And now login using our user
+POST http://127.0.0.1:8000/users/login
+Content-Type: application/x-www-form-urlencoded
+[Form]
+username: fotis.koutoulakis@gmail.com
+password: fotis is great!
+HTTP 200
