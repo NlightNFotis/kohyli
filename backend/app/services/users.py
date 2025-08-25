@@ -21,8 +21,7 @@ class UsersService:
     async def create(self, user_signup: UserCreate) -> User:
         """Create a new user (part of the signup workflow)."""
         user = User(**user_signup.model_dump(exclude=["password"]))
-        hashed_password = self._pwd_context.hash(user_signup.password)
-        user.password_hash = hashed_password
+        user.password_hash = self._pwd_context.hash(user_signup.password)
         user.created_at = datetime.now()
 
         self._session.add(user)

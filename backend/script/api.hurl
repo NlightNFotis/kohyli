@@ -48,3 +48,15 @@ HTTP 200
 [Asserts]
 jsonpath "$" count == 1
 jsonpath "$.[0].title" == "The Hobbit"
+
+# Let's try signing up a new user
+POST http://127.0.0.1:8000/users/signup
+{
+    "first_name": "Fotis",
+    "last_name": "Koutoulakis",
+    "email": "fotis.koutoulakis@gmail.com",
+    "password": "fotis is great!"
+}
+HTTP 200
+[Asserts]
+jsonpath "$.first_name" == "Fotis"
