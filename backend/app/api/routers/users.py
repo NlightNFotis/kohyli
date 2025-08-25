@@ -40,6 +40,21 @@ async def login_user(
     return JWTToken(access_token=token, type="jwt")
 
 
+@users_router.delete("/delete")
+async def delete_user(users_service: UsersServiceDep, token: TokenDep) -> bool:
+    # Ensure first that our token is valid/not tampered with.
+    data = decode_access_token(token)
+    if not data or not data.get("user_id"):
+        raise HTTPException(status_code=401, detail="Invalid token.")
+
+    # We have a valid token, so we can proceed with trying to delete the user.
+    user = await users_service.delete(data.get("user_id"))
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+
+    return True
+
+
 @users_router.get("/{id}")
 async def get_user(id: int, users_service: UsersServiceDep) -> User:
     """Retrieve a specific user, by id, from the database."""
@@ -58,19 +73,21 @@ async def get_user_by_email(email: str, users_service: UsersServiceDep) -> User:
     return user
 
 
-@users_router.get("/{user_id}/orders")
+@users_router.get("/orders")
 async def get_user_orders(
-    user_id: int, users_service: UsersServiceDep, token: TokenDep
+    users_service: UsersServiceDep, token: TokenDep
 ) -> List[Order]:
     """Retrieve all orders for a specific user."""
-    user = await users_service.get_by_id(user_id)
+
+    # Ensure first that our token is valid/not tampered with.
+    data = decode_access_token(token)
+    if not data or not data.get("user_id"):
+        raise HTTPException(status_code=401, detail="Invalid token.")
+
+    # We have a valid token, so we can proceed by identifying the user.
+    user = await users_service.get_by_id(data.get("user_id"))
     if not user:
         raise HTTPException(status_code=404, detail="User not found.")
 
-    data = decode_access_token(token)
-    if not data:
-        raise HTTPException(status_code=401, detail="Invalid token.")
-
-    id = data.get("user_id")
-
-    return await users_service.get_orders_for_user(id)
+    # Now that we know that we have a valid user, fetch their orders.
+    return await users_service.get_orders_for_user(user.id)

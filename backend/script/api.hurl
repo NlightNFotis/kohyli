@@ -68,3 +68,10 @@ Content-Type: application/x-www-form-urlencoded
 username: fotis.koutoulakis@gmail.com
 password: fotis is great!
 HTTP 200
+[Captures]
+jwt_token: jsonpath "$.access_token"
+
+# Let's now delete our user
+DELETE http://127.0.0.1:8000/users/delete
+Authorization: bearer {{jwt_token}}
+HTTP 200

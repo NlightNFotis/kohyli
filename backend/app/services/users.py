@@ -45,13 +45,11 @@ class UsersService:
 
         token = generate_access_token(
             data={
-                "user": {
-                    # TODO: FOTIS: VERY UNSAFE! Change this to be encrypted or something
-                    "user_id": user.id,
-                    "email": user.email,
-                    "first_name": user.first_name,
-                    "last_name": user.last_name,
-                }
+                # TODO: FOTIS: VERY UNSAFE! Change this to be encrypted or something
+                "user_id": user.id,
+                "email": user.email,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
             }
         )
 
@@ -65,6 +63,15 @@ class UsersService:
     async def get_by_id(self, user_id: int) -> User | None:
         """Return a user by id or None if not found."""
         return await self._session.get(User, user_id)
+
+    async def delete(self, user_id: int) -> User | None:
+        """Delete a user by id."""
+        user = await self.get_by_id(user_id)
+        if not user:
+            return None
+        await self._session.delete(user)
+        await self._session.commit()
+        return user
 
     async def get_by_email(self, email: str) -> User | None:
         """Return a user by email or None if not found."""
