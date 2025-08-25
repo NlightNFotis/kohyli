@@ -68,3 +68,5 @@ Content-Type: application/x-www-form-urlencoded
 username: fotis.koutoulakis@gmail.com
 password: fotis is great!
 HTTP 200
+[Asserts]
+bytes count == 170

@@ -1,11 +1,13 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List, Annotated
 
+import jwt
 from fastapi import Depends
 from sqlmodel import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from passlib.context import CryptContext
 
+from app.config import jwt_settings
 from app.api.schemas.users import UserCreate
 from app.database.models import User, Order
 from app.database.session import SessionDep
@@ -29,14 +31,30 @@ class UsersService:
         await self._session.refresh(user)
         return user
 
-    async def login(self, email: str, password: str) -> User | None:
-        """Login a user."""
+    async def login(self, email: str, password: str) -> str | None:
+        """Verify user credentials and a JWT token if valid."""
         user = await self.get_by_email(email)
-        if not user:
+        if (
+            not user  # user hasn't signed up yet
+            or not self._pwd_context.verify(
+                password, user.password_hash
+            )  # wrong password
+        ):
             return None
-        if not self._pwd_context.verify(password, user.password_hash):
-            return None
-        return user
+
+        token: str = jwt.encode(
+            payload={
+                "user": {
+                    "email": user.email,
+                },
+                "exp": datetime.now()
+                + timedelta(minutes=jwt_settings.access_token_expire_minutes),
+            },
+            algorithm=jwt_settings.JWT_ALGORITHM,
+            key=jwt_settings.JWT_SECRET,
+        )
+
+        return token
 
     async def get_all(self) -> List[User]:
         """Return all users."""

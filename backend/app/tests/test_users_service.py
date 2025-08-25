@@ -129,7 +129,7 @@ async def test_create_user_success(session: AsyncSession):
         first_name="John",
         last_name="Doe",
         email="john@example.com",
-        password="somehash"
+        password="somehash",
     )
 
     # Act
@@ -152,7 +152,7 @@ async def test_create_user_duplicate_email(session: AsyncSession):
         first_name="Another",
         last_name="User",
         email="alice@example.com",  # Already exists
-        password="hash"
+        password="hash",
     )
 
     # Act & Assert
@@ -172,7 +172,7 @@ async def test_create_user_invalid_data(session: AsyncSession):
             first_name="",  # Empty first name
             last_name="Test",
             email="invalid",  # Invalid email
-            password=""  # Empty password
+            password="",  # Empty password
         )
 
         await svc.create(invalid_user)
@@ -228,4 +228,3 @@ async def test_get_orders_for_user_positive_and_degenerate(session: AsyncSession
     # Non-existent user id: service queries orders table and should return empty list
     orders_none = await svc.get_orders_for_user(999999)
     assert orders_none == []
-
