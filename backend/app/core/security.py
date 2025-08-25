@@ -4,6 +4,7 @@ from fastapi import Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 
 from app.database.models import User
+from app.database.redis import is_token_blacklisted
 from app.services.users import UsersServiceDep
 from app.utils import decode_access_token
 
@@ -19,7 +20,11 @@ async def get_access_token(token: TokenDep) -> dict:
     data = decode_access_token(token)
     # Perform additional validation on the token data so that later
     # pipeline functions can depend on the presence of the correct data.
-    if not data or not data.get("user_id"):
+    if (
+        not data
+        or not data.get("user_id")
+        or await is_token_blacklisted(data.get("jti"))
+    ):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token."
         )

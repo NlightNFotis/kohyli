@@ -8,6 +8,7 @@ from ..schemas.users import UserCreate, JWTToken
 from app.core.security import TokenDep, SignedInUserDep
 from app.database.models import User, Order
 from app.services.users import UsersServiceDep
+from ...database.redis import add_token_to_blacklist
 
 users_router = APIRouter(prefix="/users")
 
@@ -47,3 +48,9 @@ async def get_user_orders(
 ) -> List[Order]:
     """Retrieve all orders for a specific user."""
     return await users_service.get_orders_for_user(user.id)
+
+
+@users_router.get("/logout")
+async def logout_user(token: TokenDep) -> bool:
+    await add_token_to_blacklist(token.jti)
+    return True
