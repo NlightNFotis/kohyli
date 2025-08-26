@@ -1,6 +1,5 @@
 import type {ButtonHTMLAttributes, FC} from "react";
 
-// Button Component
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: 'default' | 'destructive' | 'outline' | 'ghost';
     size?: 'default' | 'sm' | 'lg';
