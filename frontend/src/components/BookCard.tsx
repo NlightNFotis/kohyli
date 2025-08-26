@@ -7,7 +7,7 @@ import { StarRating } from "./StarRating.tsx";
 export const BookCard: FC<{ book: Book }> = ({ book }) => {
     return (
         <Card className="overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 ease-in-out group">
-            <div className="relative">
+            <div className="relative overflow-hidden">
                 <img
                     src={book.coverImage}
                     alt={`Cover of ${book.title}`}

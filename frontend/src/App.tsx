@@ -5,8 +5,6 @@ import {mockBooks} from "./data/mockBooks.ts";
 import {Header} from "./components/Header.tsx";
 import {Select, SelectItem} from "./components/ui/Select.tsx";
 import {BookCard} from "./components/BookCard.tsx";
-
-import './App.css'
 import {Footer} from "./components/Footer.tsx";
 
 
