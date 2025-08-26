@@ -5,7 +5,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     size?: 'default' | 'sm' | 'lg';
 }
 
-const Button: FC<ButtonProps> = ({ children, variant = 'default', size = 'default', className = '', ...props }) => {
+export const Button: FC<ButtonProps> = ({ children, variant = 'default', size = 'default', className = '', ...props }) => {
     const baseStyles = "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 disabled:opacity-50 disabled:pointer-events-none";
 
     const variants = {

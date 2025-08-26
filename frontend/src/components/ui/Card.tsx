@@ -7,10 +7,10 @@ interface CardProps {
     className?: string;
 }
 
-const Card: FC<CardProps> = ({ children, className = '' }) => (
+export const Card: FC<CardProps> = ({ children, className = '' }) => (
     <div className={`rounded-lg border bg-white text-slate-800 shadow-sm ${className}`}>{children}</div>
 );
 
-const CardContent: FC<CardProps> = ({ children, className = '' }) => (
+export const CardContent: FC<CardProps> = ({ children, className = '' }) => (
     <div className={`p-4 ${className}`}>{children}</div>
 );
