@@ -7,7 +7,7 @@ interface SelectProps {
     children: ReactNode;
 }
 
-const Select: FC<SelectProps> = ({ value, onValueChange, children }) => {
+export const Select: FC<SelectProps> = ({ value, onValueChange, children }) => {
     const [isOpen, setIsOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
 
@@ -51,7 +51,7 @@ interface SelectItemProps {
     onClick?: () => void;
 }
 
-const SelectItem: FC<SelectItemProps> = ({ children, onClick }) => (
+export const SelectItem: FC<SelectItemProps> = ({ children, onClick }) => (
     <div onClick={onClick} className="relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none hover:bg-slate-100">
         {children}
     </div>
