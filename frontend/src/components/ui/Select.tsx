@@ -36,7 +36,7 @@ export const Select: FC<SelectProps> = ({ value, onValueChange, children }) => {
                 <div className="absolute z-10 mt-1 w-full rounded-md border bg-white shadow-lg">
                     <div className="p-1">
                         {React.Children.map(children, (child) =>
-                            React.isValidElement(child) ? React.cloneElement(child as React.ReactElement<any>, { onClick: () => handleSelect(child.props.value) }) : child
+                            React.isValidElement<{ value: string, onClick?: () => void }>(child) ? React.cloneElement(child, { onClick: () => handleSelect(child.props.value) }) : child
                         )}
                     </div>
                 </div>
