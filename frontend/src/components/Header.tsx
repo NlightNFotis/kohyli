@@ -6,9 +6,12 @@ import { Search, User, ShoppingCart, Menu, X } from 'lucide-react';
 import { Button } from "./ui/Button.tsx";
 import { Input } from "./ui/Input.tsx";
 import { SeashellLogo } from "./SeashellLogo.tsx";
+import { useCart } from "../context/CartContext.tsx";
 
 export const Header: FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+    const { cart } = useCart();
+    const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
 
     return (
         <header className="bg-white/80 backdrop-blur-sm shadow-sm sticky top-0 z-50">
@@ -32,10 +35,14 @@ export const Header: FC = () => {
                         <Link to="/login">
                             <Button variant="ghost" size="sm"><User size={20} /></Button>
                         </Link>
-                        <Button variant="ghost" size="sm" className="relative">
-                            <ShoppingCart size={20} />
-                            <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">3</span>
-                        </Button>
+                        <Link to="/cart">
+                            <Button variant="ghost" size="sm" className="relative">
+                                <ShoppingCart size={20} />
+                                {totalItems > 0 && (
+                                    <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">{totalItems}</span>
+                                )}
+                            </Button>
+                        </Link>
                         <div className="md:hidden">
                             <Button variant="ghost" size="sm" onClick={() => setIsMenuOpen(!isMenuOpen)}>
                                 {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
