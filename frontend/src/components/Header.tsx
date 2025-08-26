@@ -29,7 +29,9 @@ export const Header: FC = () => {
                             <Input type="text" placeholder="Search books..." className="w-48 lg:w-64 pl-10" />
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                         </div>
-                        <Button variant="ghost" size="sm"><User size={20} /></Button>
+                        <Link to="/login">
+                            <Button variant="ghost" size="sm"><User size={20} /></Button>
+                        </Link>
                         <Button variant="ghost" size="sm" className="relative">
                             <ShoppingCart size={20} />
                             <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">3</span>

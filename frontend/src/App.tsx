@@ -5,6 +5,7 @@ import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { Home } from './components/Home';
 import { About } from './components/About';
+import { Login } from './components/Login';
 
 
 
@@ -16,6 +17,7 @@ const App: FC = () => {
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/about" element={<About />} />
+                    <Route path="/login" element={<Login />} />
                 </Routes>
                 <Footer />
             </div>

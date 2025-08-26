@@ -32,7 +32,7 @@ export const Footer: FC = () => {
                     </div>
                 </div>
                 <div className="mt-8 border-t border-slate-700 pt-6 text-center text-slate-400">
-                    <p>&copy; 2024 Vivliopoleio Kohyli. All Rights Reserved.</p>
+                    <p>&copy; 2025 Vivliopoleio Kohyli. All Rights Reserved.</p>
                 </div>
             </div>
         </footer>
