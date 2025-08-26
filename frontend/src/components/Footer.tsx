@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import type { FC } from "react";
 
 export const Footer: FC = () => {
@@ -15,15 +16,15 @@ export const Footer: FC = () => {
                     <div>
                         <h3 className="text-lg font-semibold">About Us</h3>
                         <ul className="mt-4 space-y-2">
-                            <li><a href="#" className="text-slate-400 hover:text-white">Our Story</a></li>
-                            <li><a href="#" className="text-slate-400 hover:text-white">Careers</a></li>
+                            <li><Link to="/our-story" className="text-slate-400 hover:text-white">Our Story</Link></li>
+                            <li><Link to="/careers" className="text-slate-400 hover:text-white">Careers</Link></li>
                         </ul>
                     </div>
                     <div>
                         <h3 className="text-lg font-semibold">Customer Service</h3>
                         <ul className="mt-4 space-y-2">
-                            <li><a href="#" className="text-slate-400 hover:text-white">Contact Us</a></li>
-                            <li><a href="#" className="text-slate-400 hover:text-white">FAQ</a></li>
+                            <li><Link to="/contact-us" className="text-slate-400 hover:text-white">Contact Us</Link></li>
+                            <li><Link to="/faq" className="text-slate-400 hover:text-white">FAQ</Link></li>
                         </ul>
                     </div>
                     <div>
