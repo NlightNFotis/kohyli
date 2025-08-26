@@ -1,4 +1,5 @@
 import { type FC, useState } from "react";
+import { Link } from "react-router-dom";
 import { Search, User, ShoppingCart, Menu, X } from 'lucide-react';
 
 
@@ -13,15 +14,15 @@ export const Header: FC = () => {
         <header className="bg-white/80 backdrop-blur-sm shadow-sm sticky top-0 z-50">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
-                    <a href="#" className="flex items-center gap-2 text-xl font-bold text-slate-800">
+                    <Link to="/" className="flex items-center gap-2 text-xl font-bold text-slate-800">
                         <SeashellLogo className="h-8 w-8" />
                         Vivliopoleio Kohyli
-                    </a>
+                    </Link>
                     <nav className="hidden md:flex md:space-x-8">
-                        <a href="#" className="text-slate-600 hover:text-sky-600 transition-colors">Home</a>
+                        <Link to="/" className="text-slate-600 hover:text-sky-600 transition-colors">Home</Link>
                         <a href="#" className="text-slate-600 hover:text-sky-600 transition-colors">Bestsellers</a>
                         <a href="#" className="text-slate-600 hover:text-sky-600 transition-colors">Genres</a>
-                        <a href="#" className="text-slate-600 hover:text-sky-600 transition-colors">About</a>
+                        <Link to="/about" className="text-slate-600 hover:text-sky-600 transition-colors">About</Link>
                     </nav>
                     <div className="flex items-center space-x-2">
                         <div className="relative hidden sm:block">
@@ -44,10 +45,10 @@ export const Header: FC = () => {
             {isMenuOpen && (
                 <div className="md:hidden bg-white border-t border-slate-200">
                     <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                        <a href="#" className="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-sky-600 hover:bg-slate-50">Home</a>
+                        <Link to="/" className="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-sky-600 hover:bg-slate-50">Home</Link>
                         <a href="#" className="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-sky-600 hover:bg-slate-50">Bestsellers</a>
                         <a href="#" className="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-sky-600 hover:bg-slate-50">Genres</a>
-                        <a href="#" className="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-sky-600 hover:bg-slate-50">About</a>
+                        <Link to="/about" className="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-sky-600 hover:bg-slate-50">About</Link>
                     </div>
                     <div className="px-4 py-3 border-t border-slate-200">
                         <div className="relative">
