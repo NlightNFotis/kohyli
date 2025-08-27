@@ -42,7 +42,7 @@ export const Cart: FC = () => {
                                                     <h3>
                                                         <a href="#">{item.title}</a>
                                                     </h3>
-                                                    <p className="ml-4">${Number(item.price).toFixed(2)}</p>
+                                                    <p className="ml-4">€{Number(item.price).toFixed(2)}</p>
                                                 </div>
                                                 <p className="mt-1 text-sm text-slate-500">{item.author?.first_name} {item.author?.last_name}</p>
                                             </div>
@@ -58,7 +58,7 @@ export const Cart: FC = () => {
                         <div className="border-t border-slate-200 px-4 py-6 sm:px-6 mt-6">
                             <div className="flex justify-between text-base font-medium text-slate-900">
                                 <p>Subtotal</p>
-                                <p>${total.toFixed(2)}</p>
+                                <p>€{total.toFixed(2)}</p>
                             </div>
                             <p className="mt-0.5 text-sm text-slate-500">Shipping and taxes calculated at checkout.</p>
                             <div className="mt-6">

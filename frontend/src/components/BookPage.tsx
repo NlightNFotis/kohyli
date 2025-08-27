@@ -49,7 +49,7 @@ export const BookPage: FC = () => {
                 <div>
                     <h1 className="text-4xl font-extrabold text-slate-800 mb-2">{book.title}</h1>
                     <p className="text-xl text-slate-600 mb-4">{book.author?.first_name} {book.author?.last_name}</p>
-                    <p className="text-3xl font-bold text-slate-800 mb-4">${book.price}</p>
+                    <p className="text-3xl font-bold text-slate-800 mb-4">€{Number(book.price).toFixed(2)}</p>
                     <p className="text-slate-600 mb-6">{book.description}</p>
                     <div className="flex items-center space-x-4">
                         <Button onClick={() => addToCart(book)}>Add to Cart</Button>

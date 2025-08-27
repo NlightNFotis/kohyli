@@ -27,7 +27,7 @@ export const BookCard: FC<{ book: Book }> = ({ book }) => {
                 </Link>
                 <p className="text-slate-600 text-sm mt-1">{book.author?.first_name} {book.author?.last_name}</p>
                 <div className="flex justify-between items-center mt-3">
-                    <p className="text-lg font-bold text-slate-800">${book.price}</p>
+                    <p className="text-lg font-bold text-slate-800">€{Number(book.price).toFixed(2)}</p>
                 </div>
             </CardContent>
         </Card>
