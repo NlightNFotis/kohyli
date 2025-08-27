@@ -11,6 +11,7 @@ import { OurStory } from './components/OurStory';
 import { Careers } from './components/Careers';
 import { ContactUs } from './components/ContactUs';
 import { FAQ } from './components/FAQ';
+import { BookPage } from './components/BookPage';
 import { CartProvider } from './context/CartContext';
 import { ApiProvider } from './context/ApiContext';
 
@@ -32,6 +33,7 @@ const App: FC = () => {
                             <Route path="/careers" element={<Careers />} />
                             <Route path="/contact-us" element={<ContactUs />} />
                             <Route path="/faq" element={<FAQ />} />
+                            <Route path="/books/:id" element={<BookPage />} />
                         </Routes>
                         <Footer />
                     </div>

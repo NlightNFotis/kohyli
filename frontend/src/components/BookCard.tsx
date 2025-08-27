@@ -1,4 +1,5 @@
 import { type FC } from "react";
+import { Link } from "react-router-dom";
 import { Card, CardContent } from "./ui/Card";
 import { Button } from "./ui/Button";
 import type { Book } from "../types";
@@ -21,7 +22,9 @@ export const BookCard: FC<{ book: Book }> = ({ book }) => {
                 </div>
             </div>
             <CardContent>
-                <h3 className="font-semibold text-slate-800 truncate">{book.title}</h3>
+                <Link to={`/books/${book.id}`}>
+                    <h3 className="font-semibold text-slate-800 truncate">{book.title}</h3>
+                </Link>
                 <p className="text-slate-600 text-sm mt-1">{book.author?.first_name} {book.author?.last_name}</p>
                 <div className="flex justify-between items-center mt-3">
                     <p className="text-lg font-bold text-slate-800">${book.price}</p>
