@@ -14,7 +14,12 @@ async def get_all_books(books_service: BooksServiceDep) -> List[BookRead]:
     """Retrieve all books available in our store."""
     books: List[Book] = await books_service.get_all()
     # convert the ORM instances into DTO instances
-    return [BookRead(**b.model_dump()) for b in books]
+    result = []
+    for b in books:
+        bd = b.model_dump()
+        bd["author"] = b.author.model_dump() if getattr(b, "author", None) else None
+        result.append(BookRead(**bd))
+    return result
 
 
 
@@ -25,4 +30,7 @@ async def get_book(book_id: int, books_service: BooksServiceDep) -> BookRead:
     if not book:
         raise HTTPException(status_code=404, detail="Book not found.")
 
-    return BookRead(**book.model_dump())
+    # Convert the ORM instance into the DTO that the route advertises.
+    book_data = book.model_dump()
+    book_data["author"] = book.author.model_dump() if getattr(book, "author", None) else None
+    return BookRead(**book_data)
