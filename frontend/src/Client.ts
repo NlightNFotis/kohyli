@@ -151,6 +151,20 @@ export interface Order {
   status: string;
 }
 
+/** OrderCreate */
+export interface OrderCreate {
+  /** Items */
+  items: OrderElement[];
+}
+
+/** OrderElement */
+export interface OrderElement {
+  /** Book Id */
+  book_id: number;
+  /** Quantity */
+  quantity: number;
+}
+
 /**
  * User
  * Represents a customer or user of the bookstore.
@@ -192,19 +206,6 @@ export interface UserCreate {
   email: string;
   /** Password */
   password: string;
-}
-
-/**
- * OrderCreate
- * Model for creating a new order with items
- */
-export interface OrderCreate {
-  items: {
-    /** Book Id */
-    book_id: number;
-    /** Quantity */
-    quantity: number;
-  }[];
 }
 
 /** ValidationError */
@@ -343,80 +344,53 @@ export class HttpClient<SecurityDataType = unknown> {
     }, new FormData());
   }
 
-    public request = async <T = any, _E = any>({
-                                                   secure,
-                                                   path,
-                                                   type,
-                                                   query,
-                                                   format,
-                                                   body,
-                                                   ...params
-                                               }: FullRequestParams): Promise<AxiosResponse<T>> => {
-        const secureParams =
-            ((typeof secure === "boolean" ? secure : this.secure) &&
-                this.securityWorker &&
-                (await this.securityWorker(this.securityData))) ||
-            {};
-        const requestParams = this.mergeRequestParams(params, secureParams);
-        const responseFormat = format || this.format || undefined;
+  public request = async <T = any, _E = any>({
+    secure,
+    path,
+    type,
+    query,
+    format,
+    body,
+    ...params
+  }: FullRequestParams): Promise<AxiosResponse<T>> => {
+    const secureParams =
+      ((typeof secure === "boolean" ? secure : this.secure) &&
+        this.securityWorker &&
+        (await this.securityWorker(this.securityData))) ||
+      {};
+    const requestParams = this.mergeRequestParams(params, secureParams);
+    const responseFormat = format || this.format || undefined;
 
-        if (
-            type === ContentType.FormData &&
-            body &&
-            body !== null &&
-            typeof body === "object"
-        ) {
-            body = this.createFormData(body as Record<string, unknown>);
-        }
-        // Ensure application/x-www-form-urlencoded bodies are properly serialized
-        if (
-            type === ContentType.UrlEncoded &&
-            body &&
-            body !== null &&
-            typeof body === "object"
-        ) {
-            const urlSearchParams = new URLSearchParams();
-            Object.entries(body as Record<string, unknown>).forEach(([key, value]) => {
-                if (value === undefined || value === null) return;
-                if (Array.isArray(value)) {
-                    value.forEach((v) =>
-                        urlSearchParams.append(
-                            key,
-                            typeof v === "object" ? JSON.stringify(v) : String(v),
-                        ),
-                    );
-                } else {
-                    urlSearchParams.append(
-                        key,
-                        typeof value === "object" ? JSON.stringify(value) : String(value),
-                    );
-                }
-            });
-            body = urlSearchParams.toString();
-        }
+    if (
+      type === ContentType.FormData &&
+      body &&
+      body !== null &&
+      typeof body === "object"
+    ) {
+      body = this.createFormData(body as Record<string, unknown>);
+    }
 
-        if (
-            type === ContentType.Text &&
-            body &&
-            body !== null &&
-            typeof body !== "string"
-        ) {
-            body = JSON.stringify(body);
-        }
+    if (
+      type === ContentType.Text &&
+      body &&
+      body !== null &&
+      typeof body !== "string"
+    ) {
+      body = JSON.stringify(body);
+    }
 
-        return this.instance.request({
-            ...requestParams,
-            headers: {
-                ...(requestParams.headers || {}),
-                ...(type ? { "Content-Type": type } : {}),
-            },
-            params: query,
-            responseType: responseFormat,
-            data: body,
-            url: path,
-        });
-    };
-
+    return this.instance.request({
+      ...requestParams,
+      headers: {
+        ...(requestParams.headers || {}),
+        ...(type ? { "Content-Type": type } : {}),
+      },
+      params: query,
+      responseType: responseFormat,
+      data: body,
+      url: path,
+    });
+  };
 }
 
 /**
@@ -549,8 +523,7 @@ export class Api<
       this.request<JWTToken, HTTPValidationError>({
         path: `/users/login`,
         method: "POST",
-        // Provide defaults required by OAuth2PasswordRequestForm
-        body: { scope: "", grant_type: "password", ...data },
+        body: data,
         type: ContentType.UrlEncoded,
         format: "json",
         ...params,
@@ -591,23 +564,6 @@ export class Api<
       }),
 
     /**
-     * @description Retrieve the current user.
-     *
-     * @name GetMe
-     * @summary Get Me
-     * @request GET:/users/me
-     * @secure
-     */
-    getMe: (params: RequestParams = {}) =>
-      this.request<User, any>({
-        path: `/users/me`,
-        method: "GET",
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
      * No description
      *
      * @name LogoutUser
@@ -641,13 +597,17 @@ export class Api<
       }),
 
     /**
-     * @description Create a new order for a specific user.
+     * @description Create a new order for a specific user. Expects JSON body like: { "items": [ {"book_id": 1001, "quantity": 2}, {"book_id": 1002, "quantity": 1} ] }
      *
      * @name CreateOrder
      * @summary Create Order
      * @request POST:/orders/{user_id}
      */
-    createOrder: (userId: number, data?: OrderCreate, params: RequestParams = {}) =>
+    createOrder: (
+      userId: number,
+      data: OrderCreate,
+      params: RequestParams = {},
+    ) =>
       this.request<Order, HTTPValidationError>({
         path: `/orders/${userId}`,
         method: "POST",
@@ -658,14 +618,14 @@ export class Api<
       }),
 
     /**
-     * @description Retrieve a specific order by id.
+     * @description Retrieve a specific order by id and include book details for each item.
      *
      * @name GetOrder
      * @summary Get Order
      * @request GET:/orders/{id}
      */
     getOrder: (id: number, params: RequestParams = {}) =>
-      this.request<Order, HTTPValidationError>({
+      this.request<Record<string, any>, HTTPValidationError>({
         path: `/orders/${id}`,
         method: "GET",
         format: "json",
@@ -683,21 +643,6 @@ export class Api<
       this.request<Order, HTTPValidationError>({
         path: `/orders/${id}/cancel`,
         method: "PATCH",
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Retrieve all items for a specific order.
-     *
-     * @name GetOrderItems
-     * @summary Get Order Items
-     * @request GET:/orders/{id}/items
-     */
-    getOrderItems: (id: number, params: RequestParams = {}) =>
-      this.request<Book[], HTTPValidationError>({
-        path: `/orders/${id}/items`,
-        method: "GET",
         format: "json",
         ...params,
       }),

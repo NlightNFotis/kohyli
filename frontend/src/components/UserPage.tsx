@@ -90,7 +90,18 @@ export const UserPage: FC = () => {
                 ) : (
                     <ul className="space-y-4">
                         {orders.map((order) => (
-                            <li key={order.id} className="border rounded-md p-4">
+                            <li
+                                key={order.id}
+                                role="button"
+                                tabIndex={0}
+                                onClick={() => navigate(`/orders/${order.id}`)}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter" || e.key === " ") {
+                                        navigate(`/orders/${order.id}`);
+                                    }
+                                }}
+                                className="border rounded-md p-4 cursor-pointer hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                            >
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <p className="font-semibold">Order #{order.id}</p>
@@ -99,7 +110,7 @@ export const UserPage: FC = () => {
                                         </p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="font-semibold">{order.total_price}</p>
+                                        <p className="font-semibold">€{Number(order.total_price).toFixed(2)}</p>
                                         <p className="text-sm text-slate-600 capitalize">{order.status}</p>
                                     </div>
                                 </div>

@@ -14,6 +14,8 @@ import { FAQ } from './components/FAQ';
 import { BookPage } from './components/BookPage';
 import { Signup } from './components/Signup';
 import { UserPage } from './components/UserPage';
+import ThankYou from './components/ThankYou';
+import OrderDetails from './components/OrderDetails';
 import { CartProvider } from './context/CartContext';
 import { ApiProvider } from './context/ApiContext';
 import { AuthProvider } from './context/AuthContext';
@@ -40,6 +42,8 @@ const App: FC = () => {
                                 <Route path="/books/:id" element={<BookPage />} />
                                 <Route path="/signup" element={<Signup />} />
                                 <Route path="/me" element={<UserPage />} />
+                                <Route path="/order-success" element={<ThankYou />} />
+                                <Route path="/orders/:id" element={<OrderDetails />} />
                             </Routes>
                             <Footer />
                         </div>

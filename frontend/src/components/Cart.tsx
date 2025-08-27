@@ -62,10 +62,11 @@ export const Cart: FC = () => {
                 })),
             };
             // Create the order for the user. Backend route is POST /orders/{user_id}
-            await api.orders.createOrder(Number(userId), orderData);
+            const response = await api.orders.createOrder(Number(userId), orderData);
+            // If creation succeeded, clear cart and navigate to a thank-you page with the order
             clearCart();
             alert("Order submitted successfully.");
-            navigate("/user");
+            navigate("/order-success", { state: { order: response.data } });
         } catch (error) {
             console.error("Error creating order:", error);
             alert("Failed to submit order. Please try again.");
