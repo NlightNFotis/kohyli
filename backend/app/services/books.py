@@ -1,6 +1,7 @@
 from typing import List, Annotated
 
 from fastapi import Depends
+from sqlalchemy.orm import selectinload
 from sqlmodel import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -16,19 +17,22 @@ class BooksService:
 
     async def get_all(self) -> List[Book]:
         """Return all books."""
-        result = await self._session.execute(select(Book))
+        stmt = select(Book).options(selectinload(Book.author))
+        result = await self._session.execute(stmt)
         return result.scalars().all()
 
     async def get_by_id(self, book_id: int) -> Book | None:
         """Return a book by id or None if not found."""
-        return await self._session.get(Book, book_id)
+        stmt = select(Book).options(selectinload(Book.author)).where(Book.id == book_id)
+        result = await self._session.execute(stmt)
+        return result.scalar_one_or_none()
 
     # FOTIS: This is a mirror of books_service.get_books_for_author. We
     # should probably delete one of the two, but let's keep this around
     # for now.
     async def get_by_author(self, author_id: int) -> List[Book]:
         """Return books for a specific author."""
-        stmt = select(Book).where(Book.author_id == author_id)
+        stmt = select(Book).options(selectinload(Book.author)).where(Book.author_id == author_id)
         result = await self._session.execute(stmt)
         return result.scalars().all()
 

@@ -104,6 +104,20 @@ async def test_get_all_and_get_by_id(session: AsyncSession):
     assert book.title == "The Hobbit"
     assert book.author_id == 1
 
+    # New: author should be loaded on the returned Book objects
+    # (BooksService now uses selectinload(Book.author))
+    for b in all_books:
+        assert getattr(b, "author", None) is not None
+        assert b.author.id is not None
+        assert b.author.first_name is not None
+        assert b.author.last_name is not None
+
+    # and the single book retrieved by id should have its author populated
+    assert book.author is not None
+    assert book.author.first_name == "J.R.R."
+    assert book.author.last_name == "Tolkien"
+
+
 
 @pytest.mark.asyncio
 async def test_get_by_id_not_found(session: AsyncSession):
@@ -126,10 +140,19 @@ async def test_get_by_author_positive_and_degenerate(session: AsyncSession):
     assert "The Hobbit" in titles
     assert "Another Tolkien" in titles
 
+    # New: ensure each returned book includes its author and that the FK matches
+    for b in books_a1:
+        assert b.author is not None
+        assert b.author.id == 1
+        assert b.author.first_name == "J.R.R." or b.author.first_name == "J.R.R."  # simple sanity
+
     # Positive: author 2 has one book
     books_a2 = await svc.get_by_author(2)
     assert len(books_a2) == 1
     assert books_a2[0].title == "1984"
+    assert books_a2[0].author is not None
+    assert books_a2[0].author.id == 2
+    assert books_a2[0].author.last_name == "Orwell"
 
     # Degenerate: existing author with no books
     await _clear_tables(session)
@@ -143,3 +166,4 @@ async def test_get_by_author_positive_and_degenerate(session: AsyncSession):
     # Non-existent author returns empty list (service queries books table)
     books_none = await svc.get_by_author(999999)
     assert books_none == []
+
