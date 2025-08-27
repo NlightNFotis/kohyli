@@ -330,53 +330,80 @@ export class HttpClient<SecurityDataType = unknown> {
     }, new FormData());
   }
 
-  public request = async <T = any, _E = any>({
-    secure,
-    path,
-    type,
-    query,
-    format,
-    body,
-    ...params
-  }: FullRequestParams): Promise<AxiosResponse<T>> => {
-    const secureParams =
-      ((typeof secure === "boolean" ? secure : this.secure) &&
-        this.securityWorker &&
-        (await this.securityWorker(this.securityData))) ||
-      {};
-    const requestParams = this.mergeRequestParams(params, secureParams);
-    const responseFormat = format || this.format || undefined;
+    public request = async <T = any, _E = any>({
+                                                   secure,
+                                                   path,
+                                                   type,
+                                                   query,
+                                                   format,
+                                                   body,
+                                                   ...params
+                                               }: FullRequestParams): Promise<AxiosResponse<T>> => {
+        const secureParams =
+            ((typeof secure === "boolean" ? secure : this.secure) &&
+                this.securityWorker &&
+                (await this.securityWorker(this.securityData))) ||
+            {};
+        const requestParams = this.mergeRequestParams(params, secureParams);
+        const responseFormat = format || this.format || undefined;
 
-    if (
-      type === ContentType.FormData &&
-      body &&
-      body !== null &&
-      typeof body === "object"
-    ) {
-      body = this.createFormData(body as Record<string, unknown>);
-    }
+        if (
+            type === ContentType.FormData &&
+            body &&
+            body !== null &&
+            typeof body === "object"
+        ) {
+            body = this.createFormData(body as Record<string, unknown>);
+        }
+        // Ensure application/x-www-form-urlencoded bodies are properly serialized
+        if (
+            type === ContentType.UrlEncoded &&
+            body &&
+            body !== null &&
+            typeof body === "object"
+        ) {
+            const urlSearchParams = new URLSearchParams();
+            Object.entries(body as Record<string, unknown>).forEach(([key, value]) => {
+                if (value === undefined || value === null) return;
+                if (Array.isArray(value)) {
+                    value.forEach((v) =>
+                        urlSearchParams.append(
+                            key,
+                            typeof v === "object" ? JSON.stringify(v) : String(v),
+                        ),
+                    );
+                } else {
+                    urlSearchParams.append(
+                        key,
+                        typeof value === "object" ? JSON.stringify(value) : String(value),
+                    );
+                }
+            });
+            body = urlSearchParams.toString();
+        }
 
-    if (
-      type === ContentType.Text &&
-      body &&
-      body !== null &&
-      typeof body !== "string"
-    ) {
-      body = JSON.stringify(body);
-    }
+        if (
+            type === ContentType.Text &&
+            body &&
+            body !== null &&
+            typeof body !== "string"
+        ) {
+            body = JSON.stringify(body);
+        }
 
-    return this.instance.request({
-      ...requestParams,
-      headers: {
-        ...(requestParams.headers || {}),
-        ...(type ? { "Content-Type": type } : {}),
-      },
-      params: query,
-      responseType: responseFormat,
-      data: body,
-      url: path,
-    });
-  };
+        return this.instance.request({
+            ...requestParams,
+            headers: {
+                ...(requestParams.headers || {}),
+                ...(type ? { "Content-Type": type } : {}),
+            },
+            params: query,
+            responseType: responseFormat,
+            data: body,
+            url: path,
+        });
+    };
+
 }
 
 /**
@@ -509,7 +536,8 @@ export class Api<
       this.request<JWTToken, HTTPValidationError>({
         path: `/users/login`,
         method: "POST",
-        body: data,
+        // Provide defaults required by OAuth2PasswordRequestForm
+        body: { scope: "", grant_type: "password", ...data },
         type: ContentType.UrlEncoded,
         format: "json",
         ...params,
