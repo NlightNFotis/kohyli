@@ -12,33 +12,40 @@ import { Careers } from './components/Careers';
 import { ContactUs } from './components/ContactUs';
 import { FAQ } from './components/FAQ';
 import { BookPage } from './components/BookPage';
+import { Signup } from './components/Signup';
+import { UserPage } from './components/UserPage';
 import { CartProvider } from './context/CartContext';
 import { ApiProvider } from './context/ApiContext';
+import { AuthProvider } from './context/AuthContext';
 
 
 
 const App: FC = () => {
     return (
         <ApiProvider>
-            <CartProvider>
-                <Router>
-                    <div className="bg-slate-50 min-h-screen font-sans text-slate-800">
-                        <Header />
-                        <Routes>
-                            <Route path="/" element={<Home />} />
-                            <Route path="/about" element={<About />} />
-                            <Route path="/login" element={<Login />} />
-                            <Route path="/cart" element={<Cart />} />
-                            <Route path="/our-story" element={<OurStory />} />
-                            <Route path="/careers" element={<Careers />} />
-                            <Route path="/contact-us" element={<ContactUs />} />
-                            <Route path="/faq" element={<FAQ />} />
-                            <Route path="/books/:id" element={<BookPage />} />
-                        </Routes>
-                        <Footer />
-                    </div>
-                </Router>
-            </CartProvider>
+            <AuthProvider>
+                <CartProvider>
+                    <Router>
+                        <div className="bg-slate-50 min-h-screen font-sans text-slate-800">
+                            <Header />
+                            <Routes>
+                                <Route path="/" element={<Home />} />
+                                <Route path="/about" element={<About />} />
+                                <Route path="/login" element={<Login />} />
+                                <Route path="/cart" element={<Cart />} />
+                                <Route path="/our-story" element={<OurStory />} />
+                                <Route path="/careers" element={<Careers />} />
+                                <Route path="/contact-us" element={<ContactUs />} />
+                                <Route path="/faq" element={<FAQ />} />
+                                <Route path="/books/:id" element={<BookPage />} />
+                                <Route path="/signup" element={<Signup />} />
+                                <Route path="/me" element={<UserPage />} />
+                            </Routes>
+                            <Footer />
+                        </div>
+                    </Router>
+                </CartProvider>
+            </AuthProvider>
         </ApiProvider>
     );
 };

@@ -7,10 +7,12 @@ import { Button } from "./ui/Button.tsx";
 import { Input } from "./ui/Input.tsx";
 import { SeashellLogo } from "./SeashellLogo.tsx";
 import { useCart } from "../context/CartContext.tsx";
+import { useAuth } from "../context/AuthContext.tsx";
 
 export const Header: FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
     const { cart } = useCart();
+    const { token, logout } = useAuth();
     const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
 
     return (
@@ -32,9 +34,18 @@ export const Header: FC = () => {
                             <Input type="text" placeholder="Search books..." className="w-48 lg:w-64 pl-10" />
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                         </div>
-                        <Link to="/login">
-                            <Button variant="ghost" size="sm"><User size={20} /></Button>
-                        </Link>
+                        {token ? (
+                            <>
+                                <Link to="/me">
+                                    <Button variant="ghost" size="sm"><User size={20} /></Button>
+                                </Link>
+                                <Button variant="ghost" size="sm" onClick={logout}>Logout</Button>
+                            </>
+                        ) : (
+                            <Link to="/login">
+                                <Button variant="ghost" size="sm"><User size={20} /></Button>
+                            </Link>
+                        )}
                         <Link to="/cart">
                             <Button variant="ghost" size="sm" className="relative">
                                 <ShoppingCart size={20} />

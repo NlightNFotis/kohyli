@@ -3,15 +3,20 @@ import { type FC } from "react";
 import { useCart } from "../context/CartContext";
 import { Button } from "./ui/Button";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export const Cart: FC = () => {
     const { cart, clearCart } = useCart();
+    const { token } = useAuth();
     const navigate = useNavigate();
 
     const handleCheckout = () => {
-        // For now, we'll just navigate to the login page.
-        // In a real app, you'd check if the user is logged in first.
-        navigate("/login");
+        if (!token) {
+            navigate("/login");
+        } else {
+            // Proceed to checkout
+            alert("Checkout is not implemented yet.");
+        }
     };
 
     const total = cart.reduce((acc, item) => acc + Number(item.price) * item.quantity, 0);
@@ -62,7 +67,7 @@ export const Cart: FC = () => {
                             </div>
                             <p className="mt-0.5 text-sm text-slate-500">Shipping and taxes calculated at checkout.</p>
                             <div className="mt-6">
-                                <Button onClick={handleCheckout} className="w-full">Checkout</Button>
+                                <Button onClick={handleCheckout} className="w-full" disabled={!token}>Checkout</Button>
                             </div>
                             <div className="mt-4">
                                 <Button onClick={clearCart} variant="outline" className="w-full">Clear Cart</Button>

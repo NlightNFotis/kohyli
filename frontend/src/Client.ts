@@ -550,6 +550,23 @@ export class Api<
       }),
 
     /**
+     * @description Retrieve the current user.
+     *
+     * @name GetMe
+     * @summary Get Me
+     * @request GET:/users/me
+     * @secure
+     */
+    getMe: (params: RequestParams = {}) =>
+      this.request<User, any>({
+        path: `/users/me`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
      * No description
      *
      * @name LogoutUser
