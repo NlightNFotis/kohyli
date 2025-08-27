@@ -1,0 +1,8 @@
+# Generate an Axios-based API client for the frontend. Requires FastAPI backend to be running
+generate-api-client:
+    sta generate -p http://127.0.0.1:8000/openapi.json -n Client.ts -o src/ --axios
+
+# 1-step build and preview
+build-preview:
+    npm run build
+    npm run preview
