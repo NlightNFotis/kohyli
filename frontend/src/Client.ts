@@ -25,6 +25,18 @@ export interface Author {
   biography?: string | null;
 }
 
+/** AuthorRead */
+export interface AuthorRead {
+  /** Id */
+  id: number;
+  /** First Name */
+  first_name: string;
+  /** Last Name */
+  last_name: string;
+  /** Biography */
+  biography?: string | null;
+}
+
 /** Body_login_user */
 export interface BodyLoginUser {
   /** Grant Type */
@@ -76,6 +88,30 @@ export interface Book {
   stock_quantity: number;
   /** Cover Image Url */
   cover_image_url?: string | null;
+}
+
+/** BookRead */
+export interface BookRead {
+  /** Id */
+  id: number;
+  /** Title */
+  title: string;
+  /** Isbn */
+  isbn: string;
+  /** Price */
+  price: string;
+  /**
+   * Published Date
+   * @format date-time
+   */
+  published_date: string;
+  /** Description */
+  description?: string | null;
+  /** Stock Quantity */
+  stock_quantity: number;
+  /** Cover Image Url */
+  cover_image_url?: string | null;
+  author?: AuthorRead | null;
 }
 
 /** HTTPValidationError */
@@ -422,7 +458,7 @@ export class Api<
      * @request GET:/books
      */
     getAllBooks: (params: RequestParams = {}) =>
-      this.request<Book[], any>({
+      this.request<BookRead[], any>({
         path: `/books`,
         method: "GET",
         format: "json",
@@ -437,7 +473,7 @@ export class Api<
      * @request GET:/books/{book_id}
      */
     getBook: (bookId: number, params: RequestParams = {}) =>
-      this.request<Book, HTTPValidationError>({
+      this.request<BookRead, HTTPValidationError>({
         path: `/books/${bookId}`,
         method: "GET",
         format: "json",
