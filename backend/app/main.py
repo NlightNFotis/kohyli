@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
 
 from app.api.router import combined_router
 from app.database.session import create_tables
@@ -23,6 +24,11 @@ app = FastAPI(
     version="0.1.0",
     lifespan=lifespan,
     generate_unique_id_function=lambda route: route.name,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://localhost:4173"],
 )
 
 app.include_router(combined_router)

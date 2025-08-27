@@ -12,29 +12,32 @@ import { Careers } from './components/Careers';
 import { ContactUs } from './components/ContactUs';
 import { FAQ } from './components/FAQ';
 import { CartProvider } from './context/CartContext';
+import { ApiProvider } from './context/ApiContext';
 
 
 
 const App: FC = () => {
     return (
-        <CartProvider>
-            <Router>
-                <div className="bg-slate-50 min-h-screen font-sans text-slate-800">
-                    <Header />
-                    <Routes>
-                        <Route path="/" element={<Home />} />
-                        <Route path="/about" element={<About />} />
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/cart" element={<Cart />} />
-                        <Route path="/our-story" element={<OurStory />} />
-                        <Route path="/careers" element={<Careers />} />
-                        <Route path="/contact-us" element={<ContactUs />} />
-                        <Route path="/faq" element={<FAQ />} />
-                    </Routes>
-                    <Footer />
-                </div>
-            </Router>
-        </CartProvider>
+        <ApiProvider>
+            <CartProvider>
+                <Router>
+                    <div className="bg-slate-50 min-h-screen font-sans text-slate-800">
+                        <Header />
+                        <Routes>
+                            <Route path="/" element={<Home />} />
+                            <Route path="/about" element={<About />} />
+                            <Route path="/login" element={<Login />} />
+                            <Route path="/cart" element={<Cart />} />
+                            <Route path="/our-story" element={<OurStory />} />
+                            <Route path="/careers" element={<Careers />} />
+                            <Route path="/contact-us" element={<ContactUs />} />
+                            <Route path="/faq" element={<FAQ />} />
+                        </Routes>
+                        <Footer />
+                    </div>
+                </Router>
+            </CartProvider>
+        </ApiProvider>
     );
 };
 
