@@ -1,17 +1,34 @@
 
-import {type FC, useState} from 'react'
+import {type FC, useState, useEffect} from 'react'
 
 import type {Book} from "../types";
-import {mockBooks} from "../data/mockBooks.ts";
 import {Select, SelectItem} from "./ui/Select.tsx";
 import {BookCard} from "./BookCard.tsx";
+import { Api } from '../Client';
+
+const api = new Api();
 
 export const Home: FC = () => {
-    const [books] = useState<Book[]>(mockBooks);
+    const [books, setBooks] = useState<Book[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
     const [filter, setFilter] = useState<string>('All');
 
-    const genres: string[] = ['All', ...new Set(books.map(book => book.genre))];
-    const filteredBooks: Book[] = filter === 'All' ? books : books.filter(book => book.genre === filter);
+    useEffect(() => {
+        const fetchBooks = async () => {
+            try {
+                const response = await api.books.getAllBooks();
+                setBooks(response.data);
+            } catch (error) {
+                console.error("Error fetching books:", error);
+            }
+            setLoading(false);
+        };
+
+        fetchBooks();
+    }, []);
+
+    const genres: string[] = loading || !Array.isArray(books) ? [] : ['All', ...new Set(books.map(book => book.genre || ''))];
+    const filteredBooks: Book[] = filter === 'All' ? books : (Array.isArray(books) ? books.filter(book => book.genre === filter) : []);
 
     return (
         <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -32,11 +49,15 @@ export const Home: FC = () => {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                    {filteredBooks.map(book => (
-                        <BookCard key={book.id} book={book} />
-                    ))}
-                </div>
+                {loading ? (
+                    <p>Loading books...</p>
+                ) : (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                        {Array.isArray(filteredBooks) && filteredBooks.map(book => (
+                            <BookCard key={book.id} book={book} />
+                        ))}
+                    </div>
+                )}
             </section>
         </main>
     );

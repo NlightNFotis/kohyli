@@ -14,7 +14,7 @@ export const Cart: FC = () => {
         navigate("/login");
     };
 
-    const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    const total = cart.reduce((acc, item) => acc + Number(item.price) * item.quantity, 0);
 
     return (
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -30,7 +30,7 @@ export const Cart: FC = () => {
                                     <li key={item.id} className="flex py-6">
                                         <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-slate-200">
                                             <img
-                                                src={item.coverImage}
+                                                src={item.cover_image_url || `https://placehold.co/300x450/cccccc/ffffff?text=Image+Not+Found`}
                                                 alt={item.title}
                                                 className="h-full w-full object-cover object-center"
                                             />
@@ -42,9 +42,9 @@ export const Cart: FC = () => {
                                                     <h3>
                                                         <a href="#">{item.title}</a>
                                                     </h3>
-                                                    <p className="ml-4">${item.price.toFixed(2)}</p>
+                                                    <p className="ml-4">${Number(item.price).toFixed(2)}</p>
                                                 </div>
-                                                <p className="mt-1 text-sm text-slate-500">{item.author}</p>
+                                                <p className="mt-1 text-sm text-slate-500">{item.author?.first_name} {item.author?.last_name}</p>
                                             </div>
                                             <div className="flex flex-1 items-end justify-between text-sm">
                                                 <p className="text-slate-500">Qty {item.quantity}</p>
