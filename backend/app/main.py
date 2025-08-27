@@ -22,6 +22,7 @@ app = FastAPI(
     description="A simple API for a bookstore.",
     version="0.1.0",
     lifespan=lifespan,
+    generate_unique_id_function=lambda route: route.name,
 )
 
 app.include_router(combined_router)
