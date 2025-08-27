@@ -51,6 +51,36 @@ class OrdersService:
         items = result.scalars().all()
         return items
 
+    async def get_items_with_books(self, order_id: int) -> List[dict] | None:
+        """
+        Return list of order items including the associated book data.
+        Each element is a dict with book fields plus quantity and price_at_purchase.
+        """
+        items = await self.get_items(order_id)
+        if items is None:
+            return None
+
+        enriched = []
+        for item in items:
+            book = await self._session.get(Book, item.book_id)
+            if not book:
+                # If book was removed from catalog, include minimal data
+                enriched.append({
+                    "book_id": item.book_id,
+                    "title": None,
+                    "quantity": item.quantity,
+                    "price_at_purchase": str(item.price_at_purchase),
+                })
+                continue
+
+            book_data = book.model_dump()
+            # attach order-specific fields
+            book_data["quantity"] = item.quantity
+            book_data["price_at_purchase"] = str(item.price_at_purchase)
+            enriched.append(book_data)
+
+        return enriched
+
     async def create(self, user_id: int, elements: List[dict]) -> Order:
         """
         Create a new order for the given user_id.

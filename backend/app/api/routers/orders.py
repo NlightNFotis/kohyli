@@ -35,12 +35,18 @@ async def create_order(user_id: int, payload: OrderCreate, orders_service: Order
 
 
 @orders_router.get("/{id}")
-async def get_order(id: int, orders_service: OrdersServiceDep) -> Order:
-    """Retrieve a specific order by id."""
-    order = await orders_service.get(Order, id)
+async def get_order(id: int, orders_service: OrdersServiceDep) -> dict:
+    """Retrieve a specific order by id and include book details for each item."""
+    order = await orders_service.get_by_id(id)
     if not order:
         raise HTTPException(status_code=404, detail="Order not found.")
-    return order.model_dump()
+
+    # Get order items with associated book details
+    items_with_books = await orders_service.get_items_with_books(id)
+
+    order_data = order.model_dump()
+    order_data["books"] = items_with_books or []
+    return order_data
 
 
 @orders_router.patch("/{id}/cancel")
@@ -51,13 +57,3 @@ async def cancel_order(id: int, orders_service: OrdersServiceDep) -> Order:
         raise HTTPException(status_code=404, detail="Order not found.")
     return order.model_dump()
 
-
-@orders_router.get("/{id}/items")
-async def get_order_items(id: int, orders_service: OrdersServiceDep) -> List[Book]:
-    """Retrieve all items for a specific order."""
-    items = await orders_service.get_items(id)
-    if not items:
-        raise HTTPException(status_code=404, detail="Order not found.")
-
-    # TODO: This is a OrdersItem - should we convert to book
-    return [b.model_dump() for b in items]
