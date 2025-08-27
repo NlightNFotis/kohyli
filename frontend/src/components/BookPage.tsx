@@ -1,7 +1,7 @@
 
 import { type FC, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import type { Book } from "../types";
+import type { BookRead } from "../types";
 import { useApi } from "../context/ApiContext";
 import { Button } from "./ui/Button";
 import { useCart } from "../context/CartContext";
@@ -10,7 +10,7 @@ export const BookPage: FC = () => {
     const { id } = useParams<{ id: string }>();
     const api = useApi();
     const { addToCart } = useCart();
-    const [book, setBook] = useState<Book | null>(null);
+    const [book, setBook] = useState<BookRead | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {

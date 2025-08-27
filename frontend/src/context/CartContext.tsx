@@ -1,14 +1,14 @@
 
 import { createContext, useState, useContext, type ReactNode, type FC } from 'react';
-import type { Book } from '../types';
+import type { BookRead } from '../types';
 
-interface CartItem extends Book {
+interface CartItem extends BookRead {
     quantity: number;
 }
 
 interface CartContextType {
     cart: CartItem[];
-    addToCart: (book: Book) => void;
+    addToCart: (book: BookRead) => void;
     clearCart: () => void;
 }
 
@@ -17,7 +17,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider: FC<{children: ReactNode}> = ({ children }) => {
     const [cart, setCart] = useState<CartItem[]>([]);
 
-    const addToCart = (book: Book) => {
+    const addToCart = (book: BookRead) => {
         setCart(prevCart => {
             const existingItem = prevCart.find(item => item.id === book.id);
             if (existingItem) {

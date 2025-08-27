@@ -2,10 +2,10 @@ import { type FC } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "./ui/Card";
 import { Button } from "./ui/Button";
-import type { Book } from "../types";
+import type { BookRead } from "../types";
 import { useCart } from "../context/CartContext.tsx";
 
-export const BookCard: FC<{ book: Book }> = ({ book }) => {
+export const BookCard: FC<{ book: BookRead }> = ({ book }) => {
     const { addToCart } = useCart();
 
     return (

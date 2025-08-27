@@ -1,13 +1,13 @@
 import {type FC, useState, useEffect} from 'react'
 
-import type {Book} from "../types";
+import type {BookRead} from "../types";
 import {Select, SelectItem} from "./ui/Select.tsx";
 import {BookCard} from "./BookCard.tsx";
 import { useApi } from '../context/ApiContext';
 
 export const Home: FC = () => {
     const api = useApi();
-    const [books, setBooks] = useState<Book[]>([]);
+    const [books, setBooks] = useState<BookRead[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [filter, setFilter] = useState<string>('All');
 
@@ -26,7 +26,7 @@ export const Home: FC = () => {
     }, [api]);
 
     const genres: string[] = loading || !Array.isArray(books) ? [] : ['All', ...new Set(books.map(book => book.genre || ''))];
-    const filteredBooks: Book[] = filter === 'All' ? books : (Array.isArray(books) ? books.filter(book => book.genre === filter) : []);
+    const filteredBooks: BookRead[] = filter === 'All' ? books : (Array.isArray(books) ? books.filter(book => book.genre === filter) : []);
 
     return (
         <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
