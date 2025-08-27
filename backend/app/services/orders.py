@@ -1,9 +1,11 @@
 from typing import List, Annotated
 
-from fastapi import Depends
+from fastapi import Depends, HTTPException, status
 from sqlmodel import select
+from datetime import datetime
+from decimal import Decimal
 
-from app.database.models import Order, OrderItem
+from app.database.models import Order, OrderItem, Book, User
 from app.database.session import SessionDep
 
 
@@ -49,10 +51,62 @@ class OrdersService:
         items = result.scalars().all()
         return items
 
-    async def create(self, user_id: int, *args, **kwargs) -> Order:
-        """Create a new order. Implementation detail depends on incoming payload shape.
-        Left as NotImplemented for now to keep behavior explicit and centralized."""
-        raise NotImplementedError
+    async def create(self, user_id: int, elements: List[dict]) -> Order:
+        """
+        Create a new order for the given user_id.
+
+        elements: List of dicts with keys 'book_id' and 'quantity'
+        """
+        # Verify user exists
+        user = await self._session.get(User, user_id)
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found.")
+
+        # Prepare items and validate stock
+        items_objs: List[OrderItem] = []
+        total_price = Decimal("0.00")
+
+        for elem in elements:
+            book_id = elem.book_id
+            quantity = elem.quantity
+            if quantity <= 0:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Invalid quantity for book {book_id}.")
+
+            book = await self._session.get(Book, book_id)
+            if not book:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Book with id {book_id} not found.")
+
+            if book.stock_quantity < quantity:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Insufficient stock for book id {book_id}. Requested {quantity}, available {book.stock_quantity}.",
+                )
+
+            # Create OrderItem and reserve stock
+            item_price: Decimal = book.price
+            items_objs.append(
+                OrderItem(book_id=book.id, quantity=quantity, price_at_purchase=item_price)
+            )
+
+            total_price += item_price * quantity
+
+            # decrement stock
+            book.stock_quantity = book.stock_quantity - quantity
+            self._session.add(book)
+
+        # Create Order with items (SQLModel relationship will persist OrderItems)
+        order = Order(
+            user_id=user_id,
+            order_date=datetime.now(),
+            total_price=total_price,
+            status="Created",
+            items=items_objs,
+        )
+
+        self._session.add(order)
+        await self._session.commit()
+        await self._session.refresh(order)
+        return order
 
 
 async def get_orders_service(session: SessionDep) -> OrdersService:

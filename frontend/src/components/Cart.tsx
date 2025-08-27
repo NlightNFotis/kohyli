@@ -4,18 +4,71 @@ import { useCart } from "../context/CartContext";
 import { Button } from "./ui/Button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useApi } from "../context/ApiContext";
+
+/** Decode a JWT payload (base64url) */
+function decodeJwt<T = any>(token?: string): T | null {
+    if (!token) return null;
+    try {
+        const parts = token.split(".");
+        if (parts.length < 2) return null;
+        const payload = parts[1];
+        const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
+        const jsonPayload = decodeURIComponent(
+            Array.prototype.map
+                .call(atob(base64), (c: string) => {
+                    return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+                })
+                .join("")
+        );
+        return JSON.parse(jsonPayload) as T;
+    } catch {
+        return null;
+    }
+}
 
 export const Cart: FC = () => {
     const { cart, clearCart } = useCart();
     const { token } = useAuth();
+    const api = useApi();
     const navigate = useNavigate();
 
-    const handleCheckout = () => {
+    const handleCheckout = async () => {
         if (!token) {
             navigate("/login");
-        } else {
-            // Proceed to checkout
-            alert("Checkout is not implemented yet.");
+            return;
+        }
+
+        // Attempt to extract a user id from the JWT. Support common claim names.
+        const payload = decodeJwt<Record<string, any>>(token.access_token);
+        const userId =
+            payload?.user_id ??
+            payload?.sub ??
+            payload?.id ??
+            payload?.uid ??
+            payload?.userId;
+
+        if (!userId) {
+            alert("Unable to determine user id from token. Cannot create order.");
+            return;
+        }
+
+        try {
+            // Build order payload from cart items
+            const orderData = {
+                items: cart.map(item => ({
+                    book_id: item.id,
+                    quantity: item.quantity,
+                })),
+            };
+            // Create the order for the user. Backend route is POST /orders/{user_id}
+            await api.orders.createOrder(Number(userId), orderData);
+            clearCart();
+            alert("Order submitted successfully.");
+            navigate("/user");
+        } catch (error) {
+            console.error("Error creating order:", error);
+            alert("Failed to submit order. Please try again.");
         }
     };
 

@@ -2,6 +2,7 @@ from typing import List
 
 from fastapi import APIRouter, HTTPException
 
+from app.api.schemas.orders import OrderCreate
 from app.database.models import Order, Book
 from app.services.orders import OrdersServiceDep
 
@@ -15,16 +16,22 @@ async def get_all_orders(orders_service: OrdersServiceDep) -> List[Order]:
     return [o.model_dump() for o in orders]
 
 
-# TODO: This needs to take in a list of books, but we need to see
-# how to pass them in from the frontend. Probably needs to take it
-# in the request body, but we may need a new Pydantic model for that.
 @orders_router.post("/{user_id}")
-async def create_order(user_id: int, orders_service: OrdersServiceDep) -> Order:
-    """Create a new order for a specific user."""
-    raise NotImplementedError
+async def create_order(user_id: int, payload: OrderCreate, orders_service: OrdersServiceDep) -> Order:
+    """Create a new order for a specific user.
 
-    orders_service.create(user_id)
-    # TODO
+    Expects JSON body like:
+    {
+      "items": [
+        {"book_id": 1001, "quantity": 2},
+        {"book_id": 1002, "quantity": 1}
+      ]
+    }
+    """
+    order = await orders_service.create(user_id, payload.items)
+    if not order:
+        raise HTTPException(status_code=400, detail="Failed to create order.")
+    return order.model_dump()
 
 
 @orders_router.get("/{id}")

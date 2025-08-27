@@ -194,6 +194,19 @@ export interface UserCreate {
   password: string;
 }
 
+/**
+ * OrderCreate
+ * Model for creating a new order with items
+ */
+export interface OrderCreate {
+  items: {
+    /** Book Id */
+    book_id: number;
+    /** Quantity */
+    quantity: number;
+  }[];
+}
+
 /** ValidationError */
 export interface ValidationError {
   /** Location */
@@ -634,10 +647,12 @@ export class Api<
      * @summary Create Order
      * @request POST:/orders/{user_id}
      */
-    createOrder: (userId: number, params: RequestParams = {}) =>
+    createOrder: (userId: number, data?: OrderCreate, params: RequestParams = {}) =>
       this.request<Order, HTTPValidationError>({
         path: `/orders/${userId}`,
         method: "POST",
+        body: data,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
