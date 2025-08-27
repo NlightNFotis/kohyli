@@ -16,17 +16,17 @@ test:
 
 # Generate a new alembic revision
 migration-gen name:
-    uv run alembic revision --autogenerate -m {{name}}
+    cd app && uv run alembic revision --autogenerate -m {{name}}
 
 # Get latest alembic revision hash
 migration-current:
-    uv run alembic current
+    cd app && uv run alembic current
 
 # Run an "up" migration - default target is latest (`+1`)
 migration-up-head target="head":
-    uv run alembic upgrade {{target}}
+    cd app && uv run alembic upgrade {{target}}
 
 # Run a "down" migration - default target is the base (`-1`)
 migration-down target="base":
-    uv run alembic downgrade {{target}}
+    cd app && uv run alembic downgrade {{target}}
 

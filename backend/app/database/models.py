@@ -15,6 +15,7 @@ class Author(SQLModel, table=True):
     first_name: str
     last_name: str
     biography: Optional[str] = None
+    books: List["Book"] = Relationship(back_populates="author")
 
 
 class User(SQLModel, table=True):
@@ -37,13 +38,14 @@ class Book(SQLModel, table=True):
 
     id: int = Field(primary_key=True, index=True)
     title: str
-    author_id: int
+    author_id: int = Field(foreign_key="author.id")
     isbn: str
     price: Decimal
     published_date: datetime
     description: Optional[str] = None
     stock_quantity: int
     cover_image_url: Optional[str] = None
+    author: Optional["Author"] = Relationship(back_populates="books")
 
 
 class Review(SQLModel, table=True):

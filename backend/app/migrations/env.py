@@ -22,6 +22,12 @@ from app.database.models import User, Order, OrderItem, Book, Author
 # access to the values within the .ini file in use.
 config = context.config
 
+# Ensure script_location is set (useful when running alembic from a different CWD).
+# If you keep alembic.ini next to the migrations/ directory, point to it explicitly.
+if not config.get_section("alembic") or not config.get_section("alembic").get("script_location"):
+    config.set_main_option("script_location", str(Path(__file__).resolve().parents[1] / "migrations"))
+
+
 # TODO: Fotis - see what to do if we move to Postgres
 config.set_main_option("sqlalchemy.url", "sqlite+aiosqlite:///./kohyli.db")
 
