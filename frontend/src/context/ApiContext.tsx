@@ -1,11 +1,25 @@
 
-import { createContext, useContext, type ReactNode, type FC } from 'react';
-import { Api } from '../Client';
+import { createContext, useContext, type ReactNode, type FC, useMemo } from 'react';
+import { Api, type JWTToken } from '../Client';
 
-const ApiContext = createContext<Api<unknown> | undefined>(undefined);
+const ApiContext = createContext<Api<JWTToken | null> | undefined>(undefined);
 
 export const ApiProvider: FC<{children: ReactNode}> = ({ children }) => {
-    const api = new Api({ baseURL: "http://127.0.0.1:8000" });
+    const api = useMemo(
+        () =>
+            new Api<JWTToken | null>({
+                baseURL: "http://127.0.0.1:8000",
+                securityWorker: (token) => {
+                    if (!token || !token.access_token) return;
+                    return {
+                        headers: {
+                            Authorization: `Bearer ${token.access_token}`,
+                        },
+                    };
+                },
+            }),
+        [],
+    );
 
     return (
         <ApiContext.Provider value={api}>

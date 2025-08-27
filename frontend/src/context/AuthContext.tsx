@@ -19,6 +19,7 @@ export const AuthProvider: FC<{children: ReactNode}> = ({ children }) => {
         try {
             const response = await api.users.loginUser(data);
             setToken(response.data);
+            api.setSecurityData(response.data);
         } catch (error) {
             console.error("Error logging in:", error);
         }
@@ -26,6 +27,7 @@ export const AuthProvider: FC<{children: ReactNode}> = ({ children }) => {
 
     const logout = () => {
         setToken(null);
+        api.setSecurityData(null);
     };
 
     return (
