@@ -34,7 +34,11 @@ class BooksService:
     # for now.
     async def get_by_author(self, author_id: int) -> List[Book]:
         """Return books for a specific author."""
-        stmt = select(Book).options(selectinload(Book.author)).where(Book.author_id == author_id)
+        stmt = (
+            select(Book)
+            .options(selectinload(Book.author))
+            .where(Book.author_id == author_id)
+        )
         result = await self._session.execute(stmt)
         return result.scalars().all()
 
@@ -88,7 +92,9 @@ class BooksService:
         book_ids = [row[0] for row in agg_rows]
 
         # Fetch the Book objects for these ids (load authors too)
-        books_stmt = select(Book).options(selectinload(Book.author)).where(Book.id.in_(book_ids))
+        books_stmt = (
+            select(Book).options(selectinload(Book.author)).where(Book.id.in_(book_ids))
+        )
         books_result = await self._session.execute(books_stmt)
         books = books_result.scalars().all()
 

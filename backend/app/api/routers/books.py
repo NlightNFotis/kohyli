@@ -35,18 +35,21 @@ async def get_monthly_bestsellers(
     - limit controls how many rows are returned
     """
     # Call the service to get tuples of (Book, units_sold)
-    rows = await books_service.get_monthly_bestsellers(year=year, month=month, limit=limit)
+    rows = await books_service.get_monthly_bestsellers(
+        year=year, month=month, limit=limit
+    )
 
     result: List[BestSellerRead] = []
     for book_obj, units in rows:
         # Build book DTO the same way other routes do
         bd = book_obj.model_dump()
-        bd["author"] = book_obj.author.model_dump() if getattr(book_obj, "author", None) else None
+        bd["author"] = (
+            book_obj.author.model_dump() if getattr(book_obj, "author", None) else None
+        )
         book_dto = BookRead(**bd)
         result.append(BestSellerRead(book=book_dto, units_sold=units))
 
     return result
-
 
 
 @books_router.get("/{book_id}", response_model=BookRead)
@@ -58,5 +61,7 @@ async def get_book(book_id: int, books_service: BooksServiceDep) -> BookRead:
 
     # Convert the ORM instance into the DTO that the route advertises.
     book_data = book.model_dump()
-    book_data["author"] = book.author.model_dump() if getattr(book, "author", None) else None
+    book_data["author"] = (
+        book.author.model_dump() if getattr(book, "author", None) else None
+    )
     return BookRead(**book_data)

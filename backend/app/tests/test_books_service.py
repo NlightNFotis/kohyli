@@ -125,7 +125,6 @@ async def test_get_all_and_get_by_id(session: AsyncSession):
     assert book.author.last_name == "Tolkien"
 
 
-
 @pytest.mark.asyncio
 async def test_get_by_id_not_found(session: AsyncSession):
     svc = BooksService(session)
@@ -151,7 +150,9 @@ async def test_get_by_author_positive_and_degenerate(session: AsyncSession):
     for b in books_a1:
         assert b.author is not None
         assert b.author.id == 1
-        assert b.author.first_name == "J.R.R." or b.author.first_name == "J.R.R."  # simple sanity
+        assert (
+            b.author.first_name == "J.R.R." or b.author.first_name == "J.R.R."
+        )  # simple sanity
 
     # Positive: author 2 has one book
     books_a2 = await svc.get_by_author(2)
@@ -176,6 +177,7 @@ async def test_get_by_author_positive_and_degenerate(session: AsyncSession):
 
 
 # ---------- Helpers for get_monthly_bestsellers tests ----------
+
 
 async def _seed_bestsellers_data(session: AsyncSession, year: int, month: int):
     """
@@ -341,8 +343,11 @@ async def _seed_completed_no_items(session: AsyncSession, year: int, month: int)
 
 # ---------- Tests for get_monthly_bestsellers ----------
 
+
 @pytest.mark.asyncio
-async def test_get_monthly_bestsellers_positive_ordering_and_limit(session: AsyncSession):
+async def test_get_monthly_bestsellers_positive_ordering_and_limit(
+    session: AsyncSession,
+):
     now = datetime.now(timezone.utc)
     year, month = now.year, now.month
     await _seed_bestsellers_data(session, year, month)
@@ -424,17 +429,23 @@ async def test_get_monthly_bestsellers_negative_no_results(session: AsyncSession
 
 
 @pytest.mark.asyncio
-async def test_get_monthly_bestsellers_degenerate_limit_zero_and_no_items(session: AsyncSession):
+async def test_get_monthly_bestsellers_degenerate_limit_zero_and_no_items(
+    session: AsyncSession,
+):
     now = datetime.now(timezone.utc)
     year, month = now.year, now.month
 
     # Case A: limit = 0 yields empty list even when data exists
     await _seed_bestsellers_data(session, year, month)
     svc = BooksService(session)
-    result_limit_zero = await svc.get_monthly_bestsellers(year=year, month=month, limit=0)
+    result_limit_zero = await svc.get_monthly_bestsellers(
+        year=year, month=month, limit=0
+    )
     assert result_limit_zero == []
 
     # Case B: completed order without items yields empty aggregation
     await _seed_completed_no_items(session, year, month)
-    result_no_items = await svc.get_monthly_bestsellers(year=year, month=month, limit=10)
+    result_no_items = await svc.get_monthly_bestsellers(
+        year=year, month=month, limit=10
+    )
     assert result_no_items == []

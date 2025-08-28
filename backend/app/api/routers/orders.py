@@ -17,7 +17,9 @@ async def get_all_orders(orders_service: OrdersServiceDep) -> List[Order]:
 
 
 @orders_router.post("/{user_id}")
-async def create_order(user_id: int, payload: OrderCreate, orders_service: OrdersServiceDep) -> Order:
+async def create_order(
+    user_id: int, payload: OrderCreate, orders_service: OrdersServiceDep
+) -> Order:
     """Create a new order for a specific user.
 
     Expects JSON body like:
@@ -56,4 +58,3 @@ async def cancel_order(id: int, orders_service: OrdersServiceDep) -> Order:
     if not order:
         raise HTTPException(status_code=404, detail="Order not found.")
     return order.model_dump()
-

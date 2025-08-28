@@ -65,12 +65,14 @@ class OrdersService:
             book = await self._session.get(Book, item.book_id)
             if not book:
                 # If book was removed from catalog, include minimal data
-                enriched.append({
-                    "book_id": item.book_id,
-                    "title": None,
-                    "quantity": item.quantity,
-                    "price_at_purchase": str(item.price_at_purchase),
-                })
+                enriched.append(
+                    {
+                        "book_id": item.book_id,
+                        "title": None,
+                        "quantity": item.quantity,
+                        "price_at_purchase": str(item.price_at_purchase),
+                    }
+                )
                 continue
 
             book_data = book.model_dump()
@@ -90,7 +92,9 @@ class OrdersService:
         # Verify user exists
         user = await self._session.get(User, user_id)
         if not user:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found.")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="User not found."
+            )
 
         # Prepare items and validate stock
         items_objs: List[OrderItem] = []
@@ -100,11 +104,17 @@ class OrdersService:
             book_id = elem.book_id
             quantity = elem.quantity
             if quantity <= 0:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Invalid quantity for book {book_id}.")
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Invalid quantity for book {book_id}.",
+                )
 
             book = await self._session.get(Book, book_id)
             if not book:
-                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Book with id {book_id} not found.")
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"Book with id {book_id} not found.",
+                )
 
             if book.stock_quantity < quantity:
                 raise HTTPException(
@@ -115,7 +125,9 @@ class OrdersService:
             # Create OrderItem and reserve stock
             item_price: Decimal = book.price
             items_objs.append(
-                OrderItem(book_id=book.id, quantity=quantity, price_at_purchase=item_price)
+                OrderItem(
+                    book_id=book.id, quantity=quantity, price_at_purchase=item_price
+                )
             )
 
             total_price += item_price * quantity
