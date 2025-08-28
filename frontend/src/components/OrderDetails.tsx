@@ -1,5 +1,5 @@
 import { type FC, useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useApi } from "../context/ApiContext";
 import type { Order, Book } from "../Client";
 
@@ -88,7 +88,11 @@ export const OrderDetails: FC = () => {
                     <ul className="space-y-3">
                         {items.map((b) => (
                             <li key={b.id} className="flex items-center justify-between border rounded-md p-3">
-                                <div className="flex items-center">
+                                <Link
+                                    to={`/books/${b.id}`}
+                                    className="flex items-center no-underline text-inherit"
+                                    aria-label={`View details for ${b.title}`}
+                                >
                                     <img
                                         src={
                                             b.cover_image_url ||
@@ -100,7 +104,7 @@ export const OrderDetails: FC = () => {
                                     <div>
                                         <p className="font-medium">{b.title}</p>
                                     </div>
-                                </div>
+                                </Link>
                                 <div className="text-right">
                                     <p className="font-medium">€{Number(b.price).toFixed(2)}</p>
                                     <p className="text-sm text-slate-500">Quantity: {b.quantity ?? 1}</p>
