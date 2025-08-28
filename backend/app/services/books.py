@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from decimal import Decimal
 from typing import List, Annotated, Tuple, Optional
 
 from fastapi import Depends
@@ -49,7 +50,7 @@ class BooksService:
         - Returns a list of tuples: (Book, units_sold), ordered by units_sold desc.
         """
 
-        # Default to current UTC month if not specified
+        # Default to current UTC month if not specified (use naive UTC times to match model datetimes)
         now = datetime.now(timezone.utc)
         if year is None:
             year = now.year
@@ -63,27 +64,44 @@ class BooksService:
         else:
             end = datetime(year, month + 1, 1)
 
-        # Aggregate sold quantities for completed orders within the month
-        stmt = (
-            select(Book, func.sum(OrderItem.quantity).label("units_sold"))
-            .join(OrderItem, Book.id == OrderItem.book_id)
-            .join(Order, OrderItem.order_id == Order.id)
+        # First, aggregate sold quantities per book_id for completed orders within the month.
+        # Aggregate on OrderItem.book_id to avoid GROUP BY issues when selecting full Book entity.
+        agg_stmt = (
+            select(OrderItem.book_id, func.sum(OrderItem.quantity).label("units_sold"))
+            .join(Order, Order.id == OrderItem.order_id)
             .where(
                 Order.status == "completed",
                 Order.order_date >= start,
                 Order.order_date < end,
             )
-            .group_by(Book.id)
+            .group_by(OrderItem.book_id)
             .order_by(desc(func.sum(OrderItem.quantity)))
             .limit(limit)
-            .options(selectinload(Book.author))
         )
 
-        result = await self._session.execute(stmt)
-        rows = result.all()  # list of (Book, units_sold)
-        # Normalize the aggregated value to int and return as tuples
+        agg_result = await self._session.execute(agg_stmt)
+        agg_rows = agg_result.all()  # list of (book_id, units_sold)
+        if not agg_rows:
+            return []
+
+        # Preserve ordering from aggregation
+        book_ids = [row[0] for row in agg_rows]
+
+        # Fetch the Book objects for these ids (load authors too)
+        books_stmt = select(Book).options(selectinload(Book.author)).where(Book.id.in_(book_ids))
+        books_result = await self._session.execute(books_stmt)
+        books = books_result.scalars().all()
+
+        # Map books by id for quick lookup
+        books_by_id = {b.id: b for b in books}
+
+        # Reassemble ordered list of (Book, units_sold)
         bestsellers: List[Tuple[Book, int]] = []
-        for book_obj, units in rows:
+        for book_id, units in agg_rows:
+            book_obj = books_by_id.get(book_id)
+            if book_obj is None:
+                # skip if book record not found for some reason
+                continue
             units_count = int(units) if units is not None else 0
             bestsellers.append((book_obj, units_count))
 

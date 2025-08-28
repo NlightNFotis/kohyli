@@ -2,7 +2,7 @@ from typing import List, Annotated
 
 from fastapi import Depends, HTTPException, status
 from sqlmodel import select
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 
 from app.database.models import Order, OrderItem, Book, User
@@ -127,7 +127,7 @@ class OrdersService:
         # Create Order with items (SQLModel relationship will persist OrderItems)
         order = Order(
             user_id=user_id,
-            order_date=datetime.now(),
+            order_date=datetime.now(timezone.utc),
             total_price=total_price,
             status="Created",
             items=items_objs,
