@@ -25,7 +25,7 @@ export const Header: FC = () => {
                     </Link>
                     <nav className="hidden md:flex md:space-x-8">
                         <Link to="/" className="text-slate-600 hover:text-sky-600 transition-colors">Home</Link>
-                        <a href="#" className="text-slate-600 hover:text-sky-600 transition-colors">Bestsellers</a>
+                        <Link to="/bestsellers" className="text-slate-600 hover:text-sky-600 transition-colors">Bestsellers</Link>
                         <a href="#" className="text-slate-600 hover:text-sky-600 transition-colors">Genres</a>
                         <Link to="/about" className="text-slate-600 hover:text-sky-600 transition-colors">About</Link>
                     </nav>
@@ -66,7 +66,7 @@ export const Header: FC = () => {
                 <div className="md:hidden bg-white border-t border-slate-200">
                     <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                         <Link to="/" className="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-sky-600 hover:bg-slate-50">Home</Link>
-                        <a href="#" className="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-sky-600 hover:bg-slate-50">Bestsellers</a>
+                        <Link to="/bestsellers" className="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-sky-600 hover:bg-slate-50">Bestsellers</Link>
                         <a href="#" className="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-sky-600 hover:bg-slate-50">Genres</a>
                         <Link to="/about" className="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-sky-600 hover:bg-slate-50">About</Link>
                     </div>

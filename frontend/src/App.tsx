@@ -19,6 +19,7 @@ import OrderDetails from './components/OrderDetails';
 import { CartProvider } from './context/CartContext';
 import { ApiProvider } from './context/ApiContext';
 import { AuthProvider } from './context/AuthContext';
+import { Bestsellers } from './components/Bestsellers';
 
 
 
@@ -32,6 +33,7 @@ const App: FC = () => {
                             <Header />
                             <Routes>
                                 <Route path="/" element={<Home />} />
+                                <Route path="/bestsellers" element={<Bestsellers />} />
                                 <Route path="/about" element={<About />} />
                                 <Route path="/login" element={<Login />} />
                                 <Route path="/cart" element={<Cart />} />

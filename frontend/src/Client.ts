@@ -37,6 +37,18 @@ export interface AuthorRead {
   biography?: string | null;
 }
 
+/**
+ * BestSellerRead
+ * Response model for a bestseller entry.
+ *
+ * Contains the book DTO and the units_sold for the requested month.
+ */
+export interface BestSellerRead {
+  book: BookRead;
+  /** Units Sold */
+  units_sold: number;
+}
+
 /** Body_login_user */
 export interface BodyLoginUser {
   /** Grant Type */
@@ -475,6 +487,35 @@ export class Api<
       this.request<BookRead[], any>({
         path: `/books`,
         method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Retrieve the top-selling books for a calendar month. - year and month are optional (defaults to current UTC month) - limit controls how many rows are returned
+     *
+     * @name GetMonthlyBestsellers
+     * @summary Get Monthly Bestsellers
+     * @request GET:/books/bestsellers/monthly
+     */
+    getMonthlyBestsellers: (
+      query?: {
+        /** Year */
+        year?: number | null;
+        /** Month */
+        month?: number | null;
+        /**
+         * Limit
+         * @default 10
+         */
+        limit?: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<BestSellerRead[], HTTPValidationError>({
+        path: `/books/bestsellers/monthly`,
+        method: "GET",
+        query: query,
         format: "json",
         ...params,
       }),
