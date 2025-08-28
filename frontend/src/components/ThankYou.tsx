@@ -4,6 +4,12 @@ import { useApi } from "../context/ApiContext";
 import type { Order, Book } from "../Client";
 
 /**
+ * Local type for items displayed in the thank you page.
+ * Each item includes book fields plus an optional quantity.
+ */
+type OrderItem = Book & { quantity?: number };
+
+/**
  * Displays a thank you page for a recently created order.
  * Expects navigation state: { order: Order }.
  * If state is missing, redirects to /me.
@@ -17,7 +23,7 @@ export const ThankYou: FC = () => {
     const stateOrder = (location.state as any)?.order as Order | undefined;
 
     const [order, setOrder] = useState<Order | null>(stateOrder ?? null);
-    const [items, setItems] = useState<Book[]>([]);
+    const [items, setItems] = useState<OrderItem[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
@@ -29,8 +35,29 @@ export const ThankYou: FC = () => {
 
         const fetchItems = async () => {
             try {
-                const resp = await api.orders.getOrderItems(order.id);
-                setItems(resp.data ?? []);
+                // The orders endpoint now returns order + items/books
+                const resp = await api.orders.getOrder(order.id);
+                const orderData = resp.data ?? {};
+
+                // Items may live under `items` or `books` (or be a direct array)
+                const itemsFromResp = orderData.items ?? orderData.books ?? [];
+
+                // Normalize items into OrderItem (Book + quantity)
+                const normalized: OrderItem[] = (itemsFromResp as any[]).map((it: any) => {
+                    // If item shape is { book: {...}, quantity }, extract book
+                    if (it && typeof it === "object" && it.book) {
+                        return { ...(it.book as Book), quantity: it.quantity ?? 1 };
+                    }
+
+                    // Otherwise assume it's a Book-like object possibly with quantity or qty
+                    return { ...(it as Book), quantity: (it && (it.quantity ?? it.qty)) ?? 1 };
+                });
+
+                // Update order fields (remove nested items/books keys) to keep order up-to-date
+                const { items: _items, books: _books, ...orderFields } = orderData;
+
+                setOrder(orderFields as Order);
+                setItems(normalized);
             } catch (err) {
                 console.error("Failed to fetch order items:", err);
             } finally {
@@ -71,6 +98,7 @@ export const ThankYou: FC = () => {
                                 </div>
                                 <div className="text-right">
                                     <p className="font-medium">€{Number(b.price).toFixed(2)}</p>
+                                    <p className="text-sm text-slate-500">Quantity: {b.quantity ?? 1}</p>
                                 </div>
                             </li>
                         ))}
