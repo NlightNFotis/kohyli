@@ -9,8 +9,8 @@ export const Footer: FC = () => {
                     <div>
                         <h3 className="text-lg font-semibold">Shop</h3>
                         <ul className="mt-4 space-y-2">
-                            <li><a href="#" className="text-slate-400 hover:text-white">Bestsellers</a></li>
-                            <li><a href="#" className="text-slate-400 hover:text-white">New Arrivals</a></li>
+                            <li><Link to="/bestsellers" className="text-slate-400 hover:text-white">Bestsellers</Link></li>
+                            <li><Link to="/new-arrivals" className="text-slate-400 hover:text-white">New Arrivals</Link></li>
                         </ul>
                     </div>
                     <div>

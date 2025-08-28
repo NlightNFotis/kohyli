@@ -20,6 +20,7 @@ import { CartProvider } from './context/CartContext';
 import { ApiProvider } from './context/ApiContext';
 import { AuthProvider } from './context/AuthContext';
 import { Bestsellers } from './components/Bestsellers';
+import { NewArrivals } from './components/NewArrivals';
 
 
 
@@ -34,6 +35,7 @@ const App: FC = () => {
                             <Routes>
                                 <Route path="/" element={<Home />} />
                                 <Route path="/bestsellers" element={<Bestsellers />} />
+                                <Route path="/new-arrivals" element={<NewArrivals />} />
                                 <Route path="/about" element={<About />} />
                                 <Route path="/login" element={<Login />} />
                                 <Route path="/cart" element={<Cart />} />

@@ -534,6 +534,21 @@ export class Api<
         format: "json",
         ...params,
       }),
+
+    /**
+     * @description Retrieve the most recently added books.
+     *
+     * @name GetNewArrivals
+     * @summary Get New Arrivals
+     * @request GET:/books/new_arrivals
+     */
+    getNewArrivals: (params: RequestParams = {}) =>
+      this.request<BookRead[], any>({
+        path: `/books/new_arrivals`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
   };
   users = {
     /**
