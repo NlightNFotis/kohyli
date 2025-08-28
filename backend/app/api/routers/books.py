@@ -1,8 +1,8 @@
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, HTTPException
 
-from app.api.schemas.books_authors import BookRead
+from app.api.schemas.books_authors import BookRead, BestSellerRead
 from app.database.models import Book
 from app.services.books import BooksServiceDep
 
@@ -19,6 +19,32 @@ async def get_all_books(books_service: BooksServiceDep) -> List[BookRead]:
         bd = b.model_dump()
         bd["author"] = b.author.model_dump() if getattr(b, "author", None) else None
         result.append(BookRead(**bd))
+    return result
+
+
+@books_router.get("/bestsellers/monthly", response_model=List[BestSellerRead])
+async def get_monthly_bestsellers(
+    year: Optional[int] = None,
+    month: Optional[int] = None,
+    limit: int = 10,
+    books_service: BooksServiceDep = None,
+) -> List[BestSellerRead]:
+    """
+    Retrieve the top-selling books for a calendar month.
+    - year and month are optional (defaults to current UTC month)
+    - limit controls how many rows are returned
+    """
+    # Call the service to get tuples of (Book, units_sold)
+    rows = await books_service.get_monthly_bestsellers(year=year, month=month, limit=limit)
+
+    result: List[BestSellerRead] = []
+    for book_obj, units in rows:
+        # Build book DTO the same way other routes do
+        bd = book_obj.model_dump()
+        bd["author"] = book_obj.author.model_dump() if getattr(book_obj, "author", None) else None
+        book_dto = BookRead(**bd)
+        result.append(BestSellerRead(book=book_dto, units_sold=units))
+
     return result
 
 

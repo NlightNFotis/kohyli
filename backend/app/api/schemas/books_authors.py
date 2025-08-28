@@ -21,3 +21,12 @@ class BookRead(SQLModel):
     stock_quantity: int
     cover_image_url: Optional[str] = None
     author: Optional[AuthorRead] = None
+
+class BestSellerRead(SQLModel):
+    """
+    Response model for a bestseller entry.
+
+    Contains the book DTO and the units_sold for the requested month.
+    """
+    book: BookRead
+    units_sold: int
