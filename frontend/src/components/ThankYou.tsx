@@ -91,10 +91,19 @@ export const ThankYou: FC = () => {
                 ) : (
                     <ul className="space-y-3">
                         {items.map((b) => (
-                            <li key={b.id} className="flex justify-between border rounded-md p-3">
-                                <div>
-                                    <p className="font-medium">{b.title}</p>
-                                    <p className="text-sm text-slate-500">{b.author?.first_name} {b.author?.last_name}</p>
+                            <li key={b.id} className="flex items-center justify-between border rounded-md p-3">
+                                <div className="flex items-center">
+                                    <img
+                                        src={
+                                            b.cover_image_url ||
+                                            `https://placehold.co/100x140/cccccc/ffffff?text=No+Image`
+                                        }
+                                        alt={`Cover of ${b.title}`}
+                                        className="w-16 h-20 object-cover rounded-md shadow-sm mr-4 flex-shrink-0"
+                                    />
+                                    <div>
+                                        <p className="font-medium">{b.title}</p>
+                                    </div>
                                 </div>
                                 <div className="text-right">
                                     <p className="font-medium">€{Number(b.price).toFixed(2)}</p>
