@@ -89,33 +89,36 @@ export const UserPage: FC = () => {
                     <p>No orders found.</p>
                 ) : (
                     <ul className="space-y-4">
-                        {orders.map((order) => (
-                            <li
-                                key={order.id}
-                                role="button"
-                                tabIndex={0}
-                                onClick={() => navigate(`/orders/${order.id}`)}
-                                onKeyDown={(e) => {
-                                    if (e.key === "Enter" || e.key === " ") {
-                                        navigate(`/orders/${order.id}`);
-                                    }
-                                }}
-                                className="border rounded-md p-4 cursor-pointer hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                            >
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="font-semibold">Order #{order.id}</p>
-                                        <p className="text-sm text-slate-600">
-                                            Placed on {new Date(order.order_date).toLocaleString()}
-                                        </p>
+                        {orders.map((order) => {
+                            const isCancelled = (order.status ?? "").toLowerCase() === "cancelled";
+                            return (
+                                <li
+                                    key={order.id}
+                                    role="button"
+                                    tabIndex={0}
+                                    onClick={() => navigate(`/orders/${order.id}`)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter" || e.key === " ") {
+                                            navigate(`/orders/${order.id}`);
+                                        }
+                                    }}
+                                    className={`border rounded-md p-4 cursor-pointer hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-sky-500 ${isCancelled ? "opacity-70" : ""}`}
+                                >
+                                    <div className="flex items-center justify-between">
+                                        <div className={isCancelled ? "line-through" : ""}>
+                                            <p className="font-semibold">Order #{order.id}</p>
+                                            <p className="text-sm text-slate-600">
+                                                Placed on {new Date(order.order_date).toLocaleString()}
+                                            </p>
+                                        </div>
+                                        <div className={`text-right ${isCancelled ? "line-through" : ""}`}>
+                                            <p className="font-semibold">€{Number(order.total_price).toFixed(2)}</p>
+                                            <p className="text-sm text-slate-600 capitalize">{order.status}</p>
+                                        </div>
                                     </div>
-                                    <div className="text-right">
-                                        <p className="font-semibold">€{Number(order.total_price).toFixed(2)}</p>
-                                        <p className="text-sm text-slate-600 capitalize">{order.status}</p>
-                                    </div>
-                                </div>
-                            </li>
-                        ))}
+                                </li>
+                            );
+                        })}
                     </ul>
                 )}
             </div>

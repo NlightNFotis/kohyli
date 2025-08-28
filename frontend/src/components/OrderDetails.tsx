@@ -64,6 +64,27 @@ export const OrderDetails: FC = () => {
         fetch();
     }, [id, api, navigate]);
 
+    const [cancelling, setCancelling] = useState(false);
+
+    const handleCancelOrder = async () => {
+        if (!order) return;
+        if (!confirm("Are you sure you want to cancel this order?")) return;
+
+        try {
+            setCancelling(true);
+            await api.orders.cancelOrder(order.id);
+            // Optimistically update local order status so UI reflects cancellation immediately.
+            setOrder({ ...order, status: "cancelled" } as Order);
+            // Navigate back to the user's orders page so they can see the updated list.
+            navigate("/me");
+        } catch (err) {
+            console.error("Failed to cancel order:", err);
+            alert("Unable to cancel the order. Please try again.");
+        } finally {
+            setCancelling(false);
+        }
+    };
+
     if (loading) return <p>Loading order...</p>;
     if (!order) return <p>Order not found.</p>;
 
@@ -114,13 +135,35 @@ export const OrderDetails: FC = () => {
                     </ul>
                 )}
 
-                <div className="mt-6">
-                    <button
-                        onClick={() => navigate("/me")}
-                        className="inline-flex items-center justify-center rounded-md border border-transparent bg-sky-600 px-4 py-2 text-white hover:bg-sky-700"
-                    >
-                        Back to your orders
-                    </button>
+                {/* Action bar under items */}
+                <div className="mt-6 flex items-center justify-between space-x-4">
+                    <div>
+                        <button
+                            onClick={() => navigate("/me")}
+                            className="inline-flex items-center justify-center rounded-md border border-transparent bg-sky-600 px-4 py-2 text-white hover:bg-sky-700"
+                        >
+                            Back to your orders
+                        </button>
+                    </div>
+
+                    <div>
+                        <button
+                            onClick={handleCancelOrder}
+                            disabled={order.status?.toLowerCase() === "cancelled" || cancelling}
+                            className={`inline-flex items-center justify-center rounded-md px-4 py-2 text-white shadow-sm ${
+                                order.status?.toLowerCase() === "cancelled"
+                                    ? "bg-gray-400 cursor-not-allowed"
+                                    : "bg-red-600 hover:bg-red-700"
+                            }`}
+                            aria-label="Cancel order"
+                        >
+                            {order.status?.toLowerCase() === "cancelled"
+                                ? "Cancelled"
+                                : cancelling
+                                ? "Cancelling..."
+                                : "Cancel Order"}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
