@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import List, Annotated, Tuple, Optional
 
 from fastapi import Depends
@@ -112,6 +112,26 @@ class BooksService:
             bestsellers.append((book_obj, units_count))
 
         return bestsellers
+
+    async def get_new_arrivals(
+        self, days: int = 30, limit: Optional[int] = 10
+    ) -> List[Book]:
+        """
+        Return books published within the last `days` days (default 30).
+        Results are ordered by published_date descending and authors are loaded.
+        """
+        cutoff = datetime.now(timezone.utc) - timedelta(days=days)
+
+        stmt = (
+            select(Book)
+            .options(selectinload(Book.author))
+            .where(Book.published_date >= cutoff)
+            .order_by(desc(Book.published_date))
+            .limit(limit)
+        )
+
+        result = await self._session.execute(stmt)
+        return result.scalars().all()
 
 
 async def get_books_service(session: SessionDep) -> BooksService:

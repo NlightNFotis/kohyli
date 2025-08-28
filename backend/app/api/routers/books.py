@@ -51,6 +51,18 @@ async def get_monthly_bestsellers(
 
     return result
 
+@books_router.get("/new_arrivals", response_model=List[BookRead])
+async def get_new_arrivals(books_service: BooksServiceDep) -> List[BookRead]:
+    """Retrieve the most recently added books."""
+    books =  await books_service.get_new_arrivals()
+    result = []
+    for b in books:
+        bd = b.model_dump()
+        bd["author"] = b.author.model_dump() if getattr(b, "author", None) else None
+        result.append(BookRead(**bd))
+
+    return result
+
 
 @books_router.get("/{book_id}", response_model=BookRead)
 async def get_book(book_id: int, books_service: BooksServiceDep) -> BookRead:
