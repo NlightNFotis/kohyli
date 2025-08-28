@@ -1,5 +1,4 @@
 from datetime import datetime, timezone
-from decimal import Decimal
 from typing import List, Annotated, Tuple, Optional
 
 from fastapi import Depends
@@ -70,7 +69,8 @@ class BooksService:
             select(OrderItem.book_id, func.sum(OrderItem.quantity).label("units_sold"))
             .join(Order, Order.id == OrderItem.order_id)
             .where(
-                Order.status == "completed",
+                # We want to take into account in-flight orders as well.
+                (Order.status == "Created") | (Order.status == "Completed"),
                 Order.order_date >= start,
                 Order.order_date < end,
             )

@@ -238,14 +238,14 @@ async def _seed_bestsellers_data(session: AsyncSession, year: int, month: int):
         user_id=2,
         order_date=dt(year, month, 15),
         total_price=Decimal("75.00"),
-        status="completed",
+        status="Completed",
     )
     o2 = Order(
         id=2001,
         user_id=2,
         order_date=dt(year, month, 20),
         total_price=Decimal("30.00"),
-        status="completed",
+        status="Completed",
     )
 
     # Cancelled order in month (ignored)
@@ -263,7 +263,7 @@ async def _seed_bestsellers_data(session: AsyncSession, year: int, month: int):
         user_id=2,
         order_date=dt(next_year, next_month, 5),
         total_price=Decimal("200.00"),
-        status="completed",
+        status="Completed",
     )
 
     oi1 = OrderItem(
@@ -317,7 +317,7 @@ async def _seed_completed_no_items(session: AsyncSession, year: int, month: int)
         last_name="Three",
         email="buyer3@example.com",
         password_hash="hash",
-        created_at=datetime.utcnow(),
+        created_at=datetime.now(timezone.utc),
     )
     book = Book(
         id=300,
@@ -325,7 +325,7 @@ async def _seed_completed_no_items(session: AsyncSession, year: int, month: int)
         author_id=1,
         isbn="isbn-300",
         price=Decimal("5.00"),
-        published_date=datetime.utcnow(),
+        published_date=datetime.now(timezone.utc),
         stock_quantity=100,
     )
     o = Order(
