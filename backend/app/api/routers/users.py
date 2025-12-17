@@ -5,10 +5,10 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from ..schemas.users import UserCreate, JWTToken
 
-from app.core.security import TokenDep, SignedInUserDep
+from app.core.security import TokenData, SignedInUserDep
 from app.database.models import User, Order
 from app.services.users import UsersServiceDep
-from ...database.redis import add_token_to_blacklist
+from ...database.redis import remove_token_from_whitelist
 
 users_router = APIRouter(prefix="/users")
 
@@ -51,6 +51,6 @@ async def get_user_orders(
 
 
 @users_router.get("/logout")
-async def logout_user(token: TokenDep) -> bool:
-    await add_token_to_blacklist(token.jti)
+async def logout_user(token_data: TokenData) -> bool:
+    await remove_token_from_whitelist(token_data.get("jti"))
     return True

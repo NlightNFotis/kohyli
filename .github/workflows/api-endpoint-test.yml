@@ -36,7 +36,9 @@ jobs:
         - name: Install Hurl
           run: |
             sudo apt-add-repository ppa:lepapareil/hurl
-            sudo apt install hurl="${VERSION}"*
+            sudo apt update
+            sudo apt install -y hurl
+            hurl --version
           env:
             VERSION: '7.0.0'
         

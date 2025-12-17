@@ -43,7 +43,7 @@ class UsersService:
         ):
             return None
 
-        token = generate_access_token(
+        token = await generate_access_token(
             data={
                 # TODO: FOTIS: VERY UNSAFE! Change this to be encrypted or something
                 "user_id": user.id,
