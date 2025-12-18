@@ -7,6 +7,7 @@ from decimal import Decimal
 
 from app.database.models import Order, OrderItem, Book, User
 from app.database.session import SessionDep
+from app.services.tasks import enqueue_order_confirmation_email
 
 
 class OrdersService:
@@ -98,6 +99,7 @@ class OrdersService:
 
         # Prepare items and validate stock
         items_objs: List[OrderItem] = []
+        items_for_email: List[dict] = []
         total_price = Decimal("0.00")
 
         for elem in elements:
@@ -130,6 +132,15 @@ class OrdersService:
                 )
             )
 
+            # Collect book details for email
+            items_for_email.append(
+                {
+                    "title": book.title,
+                    "quantity": quantity,
+                    "price_at_purchase": str(item_price),
+                }
+            )
+
             total_price += item_price * quantity
 
             # decrement stock
@@ -148,6 +159,17 @@ class OrdersService:
         self._session.add(order)
         await self._session.commit()
         await self._session.refresh(order)
+
+        # Enqueue order confirmation email
+        await enqueue_order_confirmation_email(
+            user_email=user.email,
+            user_name=f"{user.first_name} {user.last_name}",
+            order_id=order.id,
+            order_date=order.order_date.strftime("%Y-%m-%d %H:%M:%S UTC"),
+            total_price=str(order.total_price),
+            items=items_for_email,
+        )
+
         return order
 
 

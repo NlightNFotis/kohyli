@@ -25,3 +25,19 @@ class DatabaseSettings(BaseSettings):
 
 
 db_settings = DatabaseSettings()
+
+
+class EmailSettings(BaseSettings):
+    """Email configuration for sending order confirmations."""
+    SMTP_HOST: str = "smtp.gmail.com"
+    SMTP_PORT: int = 587
+    SMTP_USERNAME: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_FROM_EMAIL: str = "noreply@kohyli.com"
+    SMTP_FROM_NAME: str = "Kohyli Bookstore"
+    SMTP_USE_TLS: bool = True
+
+    model_config = _base_config
+
+
+email_settings = EmailSettings()
