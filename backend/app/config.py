@@ -29,6 +29,7 @@ db_settings = DatabaseSettings()
 
 class EmailSettings(BaseSettings):
     """Email configuration for sending order confirmations."""
+
     SMTP_HOST: str = "smtp.gmail.com"
     SMTP_PORT: int = 587
     SMTP_USERNAME: str = ""

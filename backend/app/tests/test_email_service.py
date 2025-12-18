@@ -1,4 +1,5 @@
 """Tests for email service."""
+
 import pytest
 
 from app.services.email import create_order_confirmation_email
@@ -39,11 +40,11 @@ def test_create_order_confirmation_email():
     assert message["To"] == user_email
     assert message["Subject"] == f"Order Confirmation #{order_id} - Kohyli Bookstore"
     assert "Kohyli Bookstore" in message["From"]
-    
+
     # Get the message parts
     parts = message.get_payload()
     assert len(parts) == 2  # text and html parts
-    
+
     # Check plain text part
     text_content = parts[0].get_payload()
     assert user_name in text_content
@@ -52,7 +53,7 @@ def test_create_order_confirmation_email():
     assert total_price in text_content
     assert "The Great Gatsby" in text_content
     assert "1984" in text_content
-    
+
     # Check HTML part
     html_content = parts[1].get_payload()
     assert user_name in html_content
@@ -88,11 +89,11 @@ def test_create_order_confirmation_email_empty_items():
     # Assert
     assert message["To"] == user_email
     assert message["Subject"] == f"Order Confirmation #{order_id} - Kohyli Bookstore"
-    
+
     # Get the message parts
     parts = message.get_payload()
     assert len(parts) == 2  # text and html parts
-    
+
     # Verify basic structure is still present
     html_content = parts[1].get_payload()
     assert user_name in html_content

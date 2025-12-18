@@ -1,4 +1,5 @@
 """Email service for sending order confirmation emails."""
+
 import logging
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -21,7 +22,7 @@ def create_order_confirmation_email(
 ) -> MIMEMultipart:
     """
     Create an HTML email for order confirmation.
-    
+
     Args:
         user_email: Recipient email address
         user_name: User's full name
@@ -29,13 +30,15 @@ def create_order_confirmation_email(
         order_date: Order date string
         total_price: Total order price
         items: List of items in the order with book details
-    
+
     Returns:
         MIMEMultipart email message
     """
     message = MIMEMultipart("alternative")
     message["Subject"] = f"Order Confirmation #{order_id} - Kohyli Bookstore"
-    message["From"] = f"{email_settings.SMTP_FROM_NAME} <{email_settings.SMTP_FROM_EMAIL}>"
+    message["From"] = (
+        f"{email_settings.SMTP_FROM_NAME} <{email_settings.SMTP_FROM_EMAIL}>"
+    )
     message["To"] = user_email
 
     # Create plain text version
@@ -49,10 +52,10 @@ def create_order_confirmation_email(
 
     Items:
     """
-    
+
     for item in items:
         text_content += f"\n- {item.get('title', 'Unknown')} x {item.get('quantity', 0)} @ ${item.get('price_at_purchase', '0.00')}"
-    
+
     text_content += f"\n\nTotal: ${total_price}"
     text_content += "\n\nThank you for shopping with Kohyli Bookstore!"
 
@@ -61,9 +64,9 @@ def create_order_confirmation_email(
     for item in items:
         items_html += f"""
         <tr>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd;">{item.get('title', 'Unknown')}</td>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">{item.get('quantity', 0)}</td>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${item.get('price_at_purchase', '0.00')}</td>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;">{item.get("title", "Unknown")}</td>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">{item.get("quantity", 0)}</td>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${item.get("price_at_purchase", "0.00")}</td>
         </tr>
         """
 
@@ -123,10 +126,10 @@ def create_order_confirmation_email(
 async def send_email(message: MIMEMultipart) -> bool:
     """
     Send an email via SMTP.
-    
+
     Args:
         message: The email message to send
-        
+
     Returns:
         True if email sent successfully, False otherwise
     """
@@ -164,7 +167,7 @@ async def send_order_confirmation_email(
 ) -> bool:
     """
     Send order confirmation email to user.
-    
+
     Args:
         user_email: Recipient email address
         user_name: User's full name
@@ -172,7 +175,7 @@ async def send_order_confirmation_email(
         order_date: Order date string
         total_price: Total order price
         items: List of items in the order with book details
-        
+
     Returns:
         True if email sent successfully, False otherwise
     """
