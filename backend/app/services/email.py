@@ -3,6 +3,7 @@
 import logging
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from textwrap import dedent
 from typing import List, Dict, Any
 
 import aiosmtplib
@@ -42,16 +43,16 @@ def create_order_confirmation_email(
     message["To"] = user_email
 
     # Create plain text version
-    text_content = f"""
-    Dear {user_name},
+    text_content = dedent(f"""
+        Dear {user_name},
 
-    Thank you for your order!
+        Thank you for your order!
 
-    Order ID: {order_id}
-    Order Date: {order_date}
+        Order ID: {order_id}
+        Order Date: {order_date}
 
-    Items:
-    """
+        Items:
+    """).strip()
 
     for item in items:
         text_content += f"\n- {item.get('title', 'Unknown')} x {item.get('quantity', 0)} @ ${item.get('price_at_purchase', '0.00')}"
@@ -62,57 +63,57 @@ def create_order_confirmation_email(
     # Create HTML version
     items_html = ""
     for item in items:
-        items_html += f"""
-        <tr>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd;">{item.get("title", "Unknown")}</td>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">{item.get("quantity", 0)}</td>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${item.get("price_at_purchase", "0.00")}</td>
-        </tr>
-        """
+        items_html += dedent(f"""
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">{item.get("title", "Unknown")}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">{item.get("quantity", 0)}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${item.get("price_at_purchase", "0.00")}</td>
+            </tr>
+        """).strip()
 
-    html_content = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px;">
-            <h1 style="color: #2c3e50; margin-top: 0;">Order Confirmation</h1>
-            <p>Dear {user_name},</p>
-            <p>Thank you for your order! Your purchase has been confirmed.</p>
-            
-            <div style="background-color: white; padding: 15px; border-radius: 5px; margin: 20px 0;">
-                <p><strong>Order ID:</strong> #{order_id}</p>
-                <p><strong>Order Date:</strong> {order_date}</p>
+    html_content = dedent(f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px;">
+                <h1 style="color: #2c3e50; margin-top: 0;">Order Confirmation</h1>
+                <p>Dear {user_name},</p>
+                <p>Thank you for your order! Your purchase has been confirmed.</p>
+                
+                <div style="background-color: white; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                    <p><strong>Order ID:</strong> #{order_id}</p>
+                    <p><strong>Order Date:</strong> {order_date}</p>
+                </div>
+
+                <h2 style="color: #2c3e50;">Order Details</h2>
+                <table style="width: 100%; border-collapse: collapse; background-color: white;">
+                    <thead>
+                        <tr style="background-color: #f8f9fa;">
+                            <th style="padding: 10px; text-align: left; border-bottom: 2px solid #ddd;">Book</th>
+                            <th style="padding: 10px; text-align: center; border-bottom: 2px solid #ddd;">Quantity</th>
+                            <th style="padding: 10px; text-align: right; border-bottom: 2px solid #ddd;">Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {items_html}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="2" style="padding: 10px; text-align: right; font-weight: bold; border-top: 2px solid #ddd;">Total:</td>
+                            <td style="padding: 10px; text-align: right; font-weight: bold; border-top: 2px solid #ddd; color: #27ae60;">${total_price}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <p style="margin-top: 20px;">Thank you for shopping with Kohyli Bookstore!</p>
             </div>
-
-            <h2 style="color: #2c3e50;">Order Details</h2>
-            <table style="width: 100%; border-collapse: collapse; background-color: white;">
-                <thead>
-                    <tr style="background-color: #f8f9fa;">
-                        <th style="padding: 10px; text-align: left; border-bottom: 2px solid #ddd;">Book</th>
-                        <th style="padding: 10px; text-align: center; border-bottom: 2px solid #ddd;">Quantity</th>
-                        <th style="padding: 10px; text-align: right; border-bottom: 2px solid #ddd;">Price</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {items_html}
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="2" style="padding: 10px; text-align: right; font-weight: bold; border-top: 2px solid #ddd;">Total:</td>
-                        <td style="padding: 10px; text-align: right; font-weight: bold; border-top: 2px solid #ddd; color: #27ae60;">${total_price}</td>
-                    </tr>
-                </tfoot>
-            </table>
-
-            <p style="margin-top: 20px;">Thank you for shopping with Kohyli Bookstore!</p>
-        </div>
-    </body>
-    </html>
-    """
+        </body>
+        </html>
+    """).strip()
 
     # Attach both versions
     part1 = MIMEText(text_content, "plain")
